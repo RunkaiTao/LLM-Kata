@@ -97,13 +97,14 @@ class GPTLanguageModel(nn.Module):
             dropout: Dropout rate.
         """
         super().__init__()
-        # TODO: Store self.block_size = block_size
-        # TODO: Create self.token_embedding_table = nn.Embedding(vocab_size, n_embd)
-        # TODO: Create self.position_embedding_table = nn.Embedding(block_size, n_embd)
-        # TODO: Create self.blocks = nn.Sequential(*[Block(...) for _ in range(n_layer)])
-        # TODO: Create self.ln_f = nn.LayerNorm(n_embd)
-        # TODO: Create self.lm_head = nn.Linear(n_embd, vocab_size)
-        # TODO: Call self.apply(self._init_weights)
+        # TODO: Store block_size as self.block_size for later use
+        # TODO: Create self.token_embedding_table as an nn.Embedding mapping vocab_size to n_embd
+        # TODO: Create self.position_embedding_table as an nn.Embedding mapping block_size to n_embd
+        # TODO: Create self.blocks as an nn.Sequential of n_layer Block instances
+        #       (each with n_embd, n_head, block_size, dropout)
+        # TODO: Create self.ln_f as an nn.LayerNorm over n_embd dimensions
+        # TODO: Create self.lm_head as a linear layer from n_embd to vocab_size (use nn.Linear)
+        # TODO: Apply weight initialization by calling self.apply with self._init_weights
         raise NotImplementedError("Implement __init__")
 
     def _init_weights(self, module):

@@ -167,17 +167,17 @@ def train_model(
         A list of loss dicts recorded at each eval point.
 
     Steps:
-    1. Create an AdamW optimizer with model.parameters() and learning_rate.
-    2. Initialize an empty list for recorded losses.
+    1. Create an AdamW optimizer over model.parameters() with the given learning_rate
+       (use torch.optim.AdamW).
+    2. Initialize an empty list to record loss evaluations.
     3. For iter in range(max_iters):
-       a. If iter % eval_interval == 0 or iter == max_iters - 1:
-          - Call estimate_loss(model, train_data, val_data, block_size, batch_size, eval_iters, device)
-          - Append result to the list.
-       b. Sample a batch: xb, yb = get_batch(train_data, block_size, batch_size, device)
-       c. Forward pass: logits, loss = model(xb, yb)
-       d. optimizer.zero_grad(set_to_none=True)
-       e. loss.backward()
-       f. optimizer.step()
+       a. If iter is a multiple of eval_interval, or it's the last iteration:
+          call estimate_loss and append the result to the list.
+       b. Sample a batch (xb, yb) from train_data using get_batch.
+       c. Forward pass: get logits and loss from the model.
+       d. Zero the gradients (use set_to_none=True for efficiency).
+       e. Backpropagate the loss.
+       f. Step the optimizer.
     4. Return the list of recorded losses.
     """
     # TODO: Implement the training loop

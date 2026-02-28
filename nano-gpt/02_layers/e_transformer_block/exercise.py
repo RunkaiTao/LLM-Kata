@@ -79,11 +79,11 @@ class Block(nn.Module):
             dropout: Dropout rate.
         """
         super().__init__()
-        # TODO: Compute head_size = n_embd // n_head
-        # TODO: Create self.sa = MultiHeadAttention(n_embd, n_head, head_size, block_size, dropout)
-        # TODO: Create self.ffwd = FeedForward(n_embd, dropout)
-        # TODO: Create self.ln1 = nn.LayerNorm(n_embd)
-        # TODO: Create self.ln2 = nn.LayerNorm(n_embd)
+        # TODO: Compute head_size by integer-dividing n_embd by n_head
+        # TODO: Create self.sa as a MultiHeadAttention layer with n_embd, n_head, head_size, block_size, dropout
+        # TODO: Create self.ffwd as a FeedForward layer with n_embd and dropout
+        # TODO: Create self.ln1 as an nn.LayerNorm over n_embd dimensions
+        # TODO: Create self.ln2 as an nn.LayerNorm over n_embd dimensions
         raise NotImplementedError("Implement __init__")
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -95,8 +95,8 @@ class Block(nn.Module):
             Output tensor of shape (B, T, n_embd).
 
         Steps:
-        1. x = x + self.sa(self.ln1(x))    # residual + pre-norm attention
-        2. x = x + self.ffwd(self.ln2(x))  # residual + pre-norm feed-forward
+        1. Apply layer norm (ln1) to x, pass through self-attention (sa), then add residual (x) back
+        2. Apply layer norm (ln2) to x, pass through feed-forward (ffwd), then add residual (x) back
         """
         # TODO: Implement the forward pass with residual connections
         raise NotImplementedError("Implement forward")

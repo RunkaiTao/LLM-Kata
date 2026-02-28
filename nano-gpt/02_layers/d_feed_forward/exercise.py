@@ -19,11 +19,11 @@ class FeedForward(nn.Module):
             dropout: Dropout rate.
         """
         super().__init__()
-        # TODO: Create self.net as nn.Sequential containing:
-        #   1. nn.Linear(n_embd, 4 * n_embd)
-        #   2. nn.ReLU()
-        #   3. nn.Linear(4 * n_embd, n_embd)
-        #   4. nn.Dropout(dropout)
+        # TODO: Create self.net as an nn.Sequential containing:
+        #   1. A linear layer expanding from n_embd to 4 * n_embd (use nn.Linear)
+        #   2. A ReLU activation (use nn.ReLU)
+        #   3. A linear layer projecting from 4 * n_embd back to n_embd (use nn.Linear)
+        #   4. A dropout layer (use nn.Dropout)
         raise NotImplementedError("Implement __init__")
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:

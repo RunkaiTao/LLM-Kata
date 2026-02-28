@@ -56,9 +56,10 @@ class MultiHeadAttention(nn.Module):
             dropout: Dropout rate.
         """
         super().__init__()
-        # TODO: Create self.heads = nn.ModuleList of n_head Head instances
-        # TODO: Create self.proj = nn.Linear(head_size * n_head, n_embd)
-        # TODO: Create self.dropout = nn.Dropout(dropout)
+        # TODO: Create self.heads as an nn.ModuleList containing n_head Head instances
+        #       (each with n_embd, head_size, block_size, dropout)
+        # TODO: Create self.proj as a linear layer projecting from head_size * n_head back to n_embd (use nn.Linear)
+        # TODO: Create self.dropout using nn.Dropout with the given dropout rate
         raise NotImplementedError("Implement __init__")
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:

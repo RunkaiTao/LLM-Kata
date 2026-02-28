@@ -121,13 +121,17 @@ class GPTLanguageModel(nn.Module):
             Tensor of shape (B, T + max_new_tokens) with the generated sequence.
 
         Steps:
-        1. For _ in range(max_new_tokens):
-           a. Crop idx to the last self.block_size tokens: idx_cond = idx[:, -self.block_size:]
-           b. Get predictions: logits, _ = self(idx_cond)
-           c. Take logits for the last time step: logits = logits[:, -1, :]  -> (B, vocab_size)
-           d. Apply softmax: probs = F.softmax(logits, dim=-1)              -> (B, vocab_size)
-           e. Sample: idx_next = torch.multinomial(probs, num_samples=1)    -> (B, 1)
-           f. Append: idx = torch.cat((idx, idx_next), dim=1)              -> (B, T+1)
+        1. For each of max_new_tokens iterations:
+           a. Crop idx to at most the last block_size tokens as idx_cond
+              (the model's context window limit)
+           b. Get logits from the model's forward pass on idx_cond (ignore loss)
+           c. Extract logits for only the last time step -> (B, vocab_size)
+           d. Convert to probabilities probs using softmax along the last dimension
+              (use F.softmax) -> (B, vocab_size)
+           e. Sample idx_next from the probability distribution
+              (use torch.multinomial with num_samples=1) -> (B, 1)
+           f. Append idx_next to idx along the sequence dimension
+              (use torch.cat) -> (B, T+1)
         2. Return idx
         """
         # TODO: Implement autoregressive generation

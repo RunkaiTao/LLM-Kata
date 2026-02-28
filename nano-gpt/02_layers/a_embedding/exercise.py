@@ -34,10 +34,10 @@ class Embeddings(nn.Module):
             Tensor of shape (B, T, n_embd): sum of token and position embeddings.
 
         Steps:
-        1. Look up token embeddings: self.token_embedding_table(idx) -> (B, T, C)
-        2. Create position indices: torch.arange(T, device=idx.device) -> (T,)
-        3. Look up position embeddings: self.position_embedding_table(positions) -> (T, C)
-        4. Sum them: tok_emb + pos_emb -> (B, T, C) via broadcasting
+        1. Look up tok_emb by passing idx through the token embedding table -> (B, T, C)
+        2. Create position indices as a range from 0 to T on the same device as idx (use torch.arange) -> (T,)
+        3. Look up pos_emb by passing position indices through the position embedding table -> (T, C)
+        4. Return the sum of tok_emb and pos_emb (broadcasting aligns shapes) -> (B, T, C)
         """
         B, T = idx.shape
         tok_emb = self.token_embedding_table(idx)

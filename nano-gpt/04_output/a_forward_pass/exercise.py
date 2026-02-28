@@ -105,16 +105,17 @@ class GPTLanguageModel(nn.Module):
             loss: Scalar cross-entropy loss, or None if no targets.
 
         Steps:
-        1. B, T = idx.shape
-        2. tok_emb = self.token_embedding_table(idx)                        -> (B, T, C)
-        3. pos_emb = self.position_embedding_table(torch.arange(T, device=idx.device))  -> (T, C)
-        4. x = tok_emb + pos_emb                                           -> (B, T, C)
-        5. x = self.blocks(x)                                              -> (B, T, C)
-        6. x = self.ln_f(x)                                                -> (B, T, C)
-        7. logits = self.lm_head(x)                                        -> (B, T, vocab_size)
+        1. Extract B, T from idx.shape
+        2. Compute tok_emb by looking up idx in the token embedding table -> (B, T, C)
+        3. Compute pos_emb by creating a range of T positions on the same device as idx
+           and looking up in the position embedding table (use torch.arange) -> (T, C)
+        4. Combine: x = tok_emb + pos_emb -> (B, T, C)
+        5. Pass x through the transformer blocks -> (B, T, C)
+        6. Apply the final layer norm to x -> (B, T, C)
+        7. Compute logits by passing x through the language model head -> (B, T, vocab_size)
         8. If targets is not None:
-              Reshape logits to (B*T, vocab_size), targets to (B*T)
-              loss = F.cross_entropy(logits, targets)
+              Reshape logits to (B*T, vocab_size) and targets to (B*T),
+              then compute loss using F.cross_entropy
            Else:
               loss = None
         9. Return (logits, loss)
