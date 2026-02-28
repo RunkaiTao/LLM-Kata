@@ -25,8 +25,11 @@ def prepare_data(
     Returns:
         A tuple of (train_data, val_data), both torch.long tensors.
     """
-    # TODO: Implement this function
-    raise NotImplementedError("Implement prepare_data")
+    data = torch.tensor(encoded_text, dtype=torch.long)
+    n = int(train_fraction * len(data))
+    train_data = data[:n]
+    val_data = data[n:]
+    return train_data, val_data
 
 
 def get_batch(
@@ -55,5 +58,8 @@ def get_batch(
     Returns:
         A tuple (x, y) where both are (batch_size, block_size) tensors.
     """
-    # TODO: Implement this function
-    raise NotImplementedError("Implement get_batch")
+    ix = torch.randint(len(data) - block_size, (batch_size,))
+    x = torch.stack([data[i : i + block_size] for i in ix])
+    y = torch.stack([data[i + 1 : i + block_size + 1] for i in ix])
+    x, y = x.to(device), y.to(device)
+    return x, y

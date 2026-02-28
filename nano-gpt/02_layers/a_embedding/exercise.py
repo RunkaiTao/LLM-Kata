@@ -22,9 +22,8 @@ class Embeddings(nn.Module):
             n_embd: Embedding dimension.
         """
         super().__init__()
-        # TODO: Create self.token_embedding_table as nn.Embedding(vocab_size, n_embd)
-        # TODO: Create self.position_embedding_table as nn.Embedding(block_size, n_embd)
-        raise NotImplementedError("Implement __init__")
+        self.token_embedding_table = nn.Embedding(vocab_size, n_embd)
+        self.position_embedding_table = nn.Embedding(block_size, n_embd)
 
     def forward(self, idx: torch.Tensor) -> torch.Tensor:
         """
@@ -40,5 +39,7 @@ class Embeddings(nn.Module):
         3. Look up position embeddings: self.position_embedding_table(positions) -> (T, C)
         4. Sum them: tok_emb + pos_emb -> (B, T, C) via broadcasting
         """
-        # TODO: Implement the forward pass
-        raise NotImplementedError("Implement forward")
+        B, T = idx.shape
+        tok_emb = self.token_embedding_table(idx)
+        pos_emb = self.position_embedding_table(torch.arange(T, device=idx.device))
+        return tok_emb + pos_emb

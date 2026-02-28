@@ -23,8 +23,11 @@ def build_vocab(text: str) -> tuple[dict, dict, int]:
     Returns:
         A tuple of (stoi, itos, vocab_size).
     """
-    # TODO: Implement this function
-    raise NotImplementedError("Implement build_vocab")
+    unique_chars = sorted(set(text))
+    stoi = {ch: i for i, ch in enumerate(unique_chars)}
+    itos = {i: ch for i, ch in enumerate(unique_chars)}
+    vocab_size = len(unique_chars)
+    return stoi, itos, vocab_size
 
 
 def encode(s: str, stoi: dict) -> list[int]:
@@ -38,8 +41,7 @@ def encode(s: str, stoi: dict) -> list[int]:
     Returns:
         A list of integers representing the encoded string.
     """
-    # TODO: Implement this function
-    raise NotImplementedError("Implement encode")
+    return [stoi[ch] for ch in s]
 
 
 def decode(token_ids: list[int], itos: dict) -> str:
@@ -53,5 +55,4 @@ def decode(token_ids: list[int], itos: dict) -> str:
     Returns:
         The decoded string.
     """
-    # TODO: Implement this function
-    raise NotImplementedError("Implement decode")
+    return ''.join(itos[i] for i in token_ids)
