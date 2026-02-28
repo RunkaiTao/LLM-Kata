@@ -6,7 +6,7 @@ The training loop is the core of model optimization:
 
 - **AdamW optimizer**: `torch.optim.AdamW(model.parameters(), lr=learning_rate)`
 - **Training loop pattern** (for each iteration):
-  1. Sample a batch: `xb, yb = get_batch('train', ...)`
+  1. Sample a batch: `xb, yb = get_batch(train_data, ...)`
   2. Forward pass: `logits, loss = model(xb, yb)`
   3. Zero gradients: `optimizer.zero_grad(set_to_none=True)`
   4. Backward pass: `loss.backward()`

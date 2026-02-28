@@ -109,8 +109,7 @@ class GPTLanguageModel(nn.Module):
 # ---------------------------------------------------------------------------
 # PROVIDED: get_batch and estimate_loss (do not modify)
 # ---------------------------------------------------------------------------
-def get_batch(split, train_data, val_data, block_size, batch_size, device="cpu"):
-    data = train_data if split == "train" else val_data
+def get_batch(data, block_size, batch_size, device="cpu"):
     ix = torch.randint(len(data) - block_size, (batch_size,))
     x = torch.stack([data[i : i + block_size] for i in ix])
     y = torch.stack([data[i + 1 : i + block_size + 1] for i in ix])
@@ -123,9 +122,10 @@ def estimate_loss(model, train_data, val_data, block_size, batch_size, eval_iter
     out = {}
     model.eval()
     for split in ["train", "val"]:
+        data = train_data if split == "train" else val_data
         losses = torch.zeros(eval_iters)
         for k in range(eval_iters):
-            X, Y = get_batch(split, train_data, val_data, block_size, batch_size, device)
+            X, Y = get_batch(data, block_size, batch_size, device)
             logits, loss = model(X, Y)
             losses[k] = loss.item()
         out[split] = losses.mean()
@@ -173,7 +173,7 @@ def train_model(
        a. If iter % eval_interval == 0 or iter == max_iters - 1:
           - Call estimate_loss(model, train_data, val_data, block_size, batch_size, eval_iters, device)
           - Append result to the list.
-       b. Sample a batch: xb, yb = get_batch('train', train_data, val_data, block_size, batch_size, device)
+       b. Sample a batch: xb, yb = get_batch(train_data, block_size, batch_size, device)
        c. Forward pass: logits, loss = model(xb, yb)
        d. optimizer.zero_grad(set_to_none=True)
        e. loss.backward()

@@ -49,7 +49,7 @@ class TestGetBatch:
 
     def test_output_shapes(self, data):
         train_data, val_data = data
-        x, y = get_batch("train", train_data, val_data, BLOCK_SIZE, BATCH_SIZE, device)
+        x, y = get_batch(train_data, BLOCK_SIZE, BATCH_SIZE, device)
         assert x.shape == (BATCH_SIZE, BLOCK_SIZE)
         assert y.shape == (BATCH_SIZE, BLOCK_SIZE)
 
@@ -57,7 +57,7 @@ class TestGetBatch:
         """y should be x shifted by one position"""
         torch.manual_seed(123)
         train_data, val_data = data
-        x, y = get_batch("train", train_data, val_data, BLOCK_SIZE, BATCH_SIZE, device)
+        x, y = get_batch(train_data, BLOCK_SIZE, BATCH_SIZE, device)
         # In our range data (0,1,2,...), y[b,t] should equal x[b,t] + 1
         for b in range(BATCH_SIZE):
             for t in range(BLOCK_SIZE):
@@ -65,19 +65,19 @@ class TestGetBatch:
 
     def test_val_split(self, data):
         train_data, val_data = data
-        x, y = get_batch("val", train_data, val_data, BLOCK_SIZE, BATCH_SIZE, device)
+        x, y = get_batch(val_data, BLOCK_SIZE, BATCH_SIZE, device)
         assert x.shape == (BATCH_SIZE, BLOCK_SIZE)
         # val_data starts at index 180, so values should be >= 180
         assert x.min().item() >= 180
 
     def test_dtype_is_long(self, data):
         train_data, val_data = data
-        x, y = get_batch("train", train_data, val_data, BLOCK_SIZE, BATCH_SIZE, device)
+        x, y = get_batch(train_data, BLOCK_SIZE, BATCH_SIZE, device)
         assert x.dtype == torch.long
         assert y.dtype == torch.long
 
     def test_device(self, data):
         train_data, val_data = data
-        x, y = get_batch("train", train_data, val_data, BLOCK_SIZE, BATCH_SIZE, device)
+        x, y = get_batch(train_data, BLOCK_SIZE, BATCH_SIZE, device)
         assert str(x.device).startswith(device.split(":")[0])
         assert str(y.device).startswith(device.split(":")[0])

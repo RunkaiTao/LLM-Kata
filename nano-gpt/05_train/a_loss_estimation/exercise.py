@@ -109,9 +109,8 @@ class GPTLanguageModel(nn.Module):
 # ---------------------------------------------------------------------------
 # PROVIDED: get_batch (do not modify)
 # ---------------------------------------------------------------------------
-def get_batch(split, train_data, val_data, block_size, batch_size, device="cpu"):
+def get_batch(data, block_size, batch_size, device="cpu"):
     """Sample a random batch of input-target pairs."""
-    data = train_data if split == "train" else val_data
     ix = torch.randint(len(data) - block_size, (batch_size,))
     x = torch.stack([data[i : i + block_size] for i in ix])
     y = torch.stack([data[i + 1 : i + block_size + 1] for i in ix])
@@ -143,12 +142,13 @@ def estimate_loss(model, train_data, val_data, block_size, batch_size, eval_iter
     1. Initialize output dict.
     2. Set model to eval mode: model.eval()
     3. For each split in ['train', 'val']:
-       a. Create a tensor of zeros with shape (eval_iters,) to accumulate losses.
-       b. For k in range(eval_iters):
-          - Get a batch: X, Y = get_batch(split, train_data, val_data, block_size, batch_size, device)
+       a. Select data: data = train_data if split == 'train' else val_data.
+       b. Create a tensor of zeros with shape (eval_iters,) to accumulate losses.
+       c. For k in range(eval_iters):
+          - Get a batch: X, Y = get_batch(data, block_size, batch_size, device)
           - Run model forward: logits, loss = model(X, Y)
           - Store loss.item() in losses[k].
-       c. Store the mean loss in the output dict.
+       d. Store the mean loss in the output dict.
     4. Set model back to train mode: model.train()
     5. Return the output dict.
     """

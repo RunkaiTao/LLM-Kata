@@ -17,7 +17,7 @@ The batch data loader handles preparing training data for the model:
 Implement two functions in `exercise.py`:
 
 1. **`prepare_data(encoded_text, train_fraction)`** - Convert to tensor and split into train/val
-2. **`get_batch(split, train_data, val_data, block_size, batch_size, device)`** - Sample a random batch
+2. **`get_batch(data, block_size, batch_size, device)`** - Sample a random batch
 
 ## Verify
 

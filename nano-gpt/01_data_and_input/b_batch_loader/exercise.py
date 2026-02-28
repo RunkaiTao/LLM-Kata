@@ -30,9 +30,7 @@ def prepare_data(
 
 
 def get_batch(
-    split: str,
-    train_data: torch.Tensor,
-    val_data: torch.Tensor,
+    data: torch.Tensor,
     block_size: int,
     batch_size: int,
     device: str = "cpu",
@@ -41,18 +39,15 @@ def get_batch(
     Sample a random batch of input-target pairs.
 
     Steps:
-    1. Select train_data or val_data based on split.
-    2. Generate batch_size random starting indices in
+    1. Generate batch_size random starting indices in
        range [0, len(data) - block_size).
-    3. For each index i, x[i] = data[i : i+block_size].
-    4. For each index i, y[i] = data[i+1 : i+block_size+1].
-    5. Stack into tensors of shape (batch_size, block_size).
-    6. Move x, y to the specified device.
+    2. For each index i, x[i] = data[i : i+block_size].
+    3. For each index i, y[i] = data[i+1 : i+block_size+1].
+    4. Stack into tensors of shape (batch_size, block_size).
+    5. Move x, y to the specified device.
 
     Args:
-        split: Either 'train' or 'val'.
-        train_data: The training data tensor.
-        val_data: The validation data tensor.
+        data: The data tensor to sample from.
         block_size: The context window size.
         batch_size: Number of sequences per batch.
         device: Device to place tensors on ('cpu' or 'cuda').
