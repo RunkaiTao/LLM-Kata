@@ -22,8 +22,8 @@ class Embeddings(nn.Module):
             n_embd: Embedding dimension.
         """
         super().__init__()
-        # TODO: Create self.token_embedding_table as nn.Embedding(vocab_size, n_embd)
-        # TODO: Create self.position_embedding_table as nn.Embedding(block_size, n_embd)
+        # TODO: Create self.token_embedding_table as an nn.Embedding mapping vocab_size tokens to n_embd dimensions
+        # TODO: Create self.position_embedding_table as an nn.Embedding mapping block_size positions to n_embd dimensions
         raise NotImplementedError("Implement __init__")
 
     def forward(self, idx: torch.Tensor) -> torch.Tensor:
@@ -35,10 +35,10 @@ class Embeddings(nn.Module):
             Tensor of shape (B, T, n_embd): sum of token and position embeddings.
 
         Steps:
-        1. Look up token embeddings: self.token_embedding_table(idx) -> (B, T, C)
-        2. Create position indices: torch.arange(T, device=idx.device) -> (T,)
-        3. Look up position embeddings: self.position_embedding_table(positions) -> (T, C)
-        4. Sum them: tok_emb + pos_emb -> (B, T, C) via broadcasting
+        1. Look up tok_emb by passing idx through the token embedding table -> (B, T, C)
+        2. Create position indices as a range from 0 to T on the same device as idx (use torch.arange) -> (T,)
+        3. Look up pos_emb by passing position indices through the position embedding table -> (T, C)
+        4. Return the sum of tok_emb and pos_emb (broadcasting aligns shapes) -> (B, T, C)
         """
         # TODO: Implement the forward pass
         raise NotImplementedError("Implement forward")

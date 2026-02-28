@@ -139,17 +139,17 @@ def estimate_loss(model, train_data, val_data, block_size, batch_size, eval_iter
         A dict {'train': mean_train_loss, 'val': mean_val_loss}
 
     Steps:
-    1. Initialize output dict.
-    2. Set model to eval mode: model.eval()
+    1. Initialize an empty output dict.
+    2. Set model to evaluation mode (use model.eval()).
     3. For each split in ['train', 'val']:
-       a. Select data: data = train_data if split == 'train' else val_data.
-       b. Create a tensor of zeros with shape (eval_iters,) to accumulate losses.
+       a. Select the appropriate data tensor based on the split name.
+       b. Create a zeros tensor of shape (eval_iters,) to store per-iteration losses.
        c. For k in range(eval_iters):
-          - Get a batch: X, Y = get_batch(data, block_size, batch_size, device)
-          - Run model forward: logits, loss = model(X, Y)
-          - Store loss.item() in losses[k].
-       d. Store the mean loss in the output dict.
-    4. Set model back to train mode: model.train()
+          - Get a batch (X, Y) using get_batch with the selected data.
+          - Run the model forward to get logits and loss.
+          - Store the scalar loss value in losses[k].
+       d. Store the mean of losses in the output dict under the split key.
+    4. Set model back to training mode (use model.train()).
     5. Return the output dict.
     """
     # TODO: Implement loss estimation

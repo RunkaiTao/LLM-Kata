@@ -15,8 +15,8 @@ def prepare_data(
 
     Steps:
     1. Convert encoded_text to a torch.long tensor.
-    2. Compute the split index: n = int(train_fraction * len(data)).
-    3. train_data = data[:n], val_data = data[n:].
+    2. Compute the split index n from train_fraction and the data length.
+    3. Split data into train_data (first n elements) and val_data (remaining elements).
 
     Args:
         encoded_text: List of integer token IDs.
@@ -41,8 +41,8 @@ def get_batch(
     Steps:
     1. Generate batch_size random starting indices in
        range [0, len(data) - block_size).
-    2. For each index i, x[i] = data[i : i+block_size].
-    3. For each index i, y[i] = data[i+1 : i+block_size+1].
+    2. For each index i, extract x[i] as a block_size-length window starting at i.
+    3. For each index i, extract y[i] as the next-token-shifted window starting at i+1.
     4. Stack into tensors of shape (batch_size, block_size).
     5. Move x, y to the specified device.
 

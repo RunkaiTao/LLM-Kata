@@ -18,11 +18,12 @@ class Head(nn.Module):
             dropout: Dropout rate for attention weights.
         """
         super().__init__()
-        # TODO: Create self.key   = nn.Linear(n_embd, head_size, bias=False)
-        # TODO: Create self.query = nn.Linear(n_embd, head_size, bias=False)
-        # TODO: Create self.value = nn.Linear(n_embd, head_size, bias=False)
-        # TODO: Register a buffer 'tril' = torch.tril(torch.ones(block_size, block_size))
-        # TODO: Create self.dropout = nn.Dropout(dropout)
+        # TODO: Create self.key as a linear projection from n_embd to head_size, no bias (use nn.Linear)
+        # TODO: Create self.query as a linear projection from n_embd to head_size, no bias (use nn.Linear)
+        # TODO: Create self.value as a linear projection from n_embd to head_size, no bias (use nn.Linear)
+        # TODO: Register a buffer named 'tril' containing a lower-triangular matrix of ones,
+        #       size block_size x block_size (use register_buffer, torch.tril, torch.ones)
+        # TODO: Create self.dropout using nn.Dropout with the given dropout rate
         raise NotImplementedError("Implement __init__")
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -35,14 +36,15 @@ class Head(nn.Module):
 
         Steps:
         1. Extract B, T, C from x.shape
-        2. Compute k = self.key(x)    -> (B, T, head_size)
-        3. Compute q = self.query(x)  -> (B, T, head_size)
-        4. Compute attention scores: wei = q @ k.transpose(-2, -1) * (k.shape[-1] ** -0.5)
-        5. Apply causal mask: wei = wei.masked_fill(self.tril[:T, :T] == 0, float('-inf'))
-        6. Apply softmax: wei = F.softmax(wei, dim=-1)
-        7. Apply dropout: wei = self.dropout(wei)
-        8. Compute v = self.value(x)  -> (B, T, head_size)
-        9. Compute output: out = wei @ v -> (B, T, head_size)
+        2. Compute k by passing x through the key projection -> (B, T, head_size)
+        3. Compute q by passing x through the query projection -> (B, T, head_size)
+        4. Compute attention scores wei as the scaled dot product of q and transposed k;
+           scale by 1/sqrt(head_size) -> (B, T, T)
+        5. Apply causal mask: fill positions where tril[:T, :T] is 0 with -inf (use masked_fill)
+        6. Normalize wei with softmax along the last dimension (use F.softmax)
+        7. Apply dropout to wei
+        8. Compute v by passing x through the value projection -> (B, T, head_size)
+        9. Compute output out as the matrix product of wei and v -> (B, T, head_size)
         """
         # TODO: Implement the forward pass
         raise NotImplementedError("Implement forward")
