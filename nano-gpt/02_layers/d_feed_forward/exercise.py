@@ -24,7 +24,12 @@ class FeedForward(nn.Module):
         #   2. A ReLU activation (use nn.ReLU)
         #   3. A linear layer projecting from 4 * n_embd back to n_embd (use nn.Linear)
         #   4. A dropout layer (use nn.Dropout)
-        raise NotImplementedError("Implement __init__")
+        self.net = nn.Sequential(
+            nn.Linear(n_embd, 4 * n_embd),
+            nn.ReLU(),
+            nn.Linear(4 * n_embd, n_embd),
+            nn.Dropout(dropout)
+        )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
@@ -35,4 +40,4 @@ class FeedForward(nn.Module):
             Output tensor of shape (B, T, n_embd).
         """
         # TODO: Implement the forward pass
-        raise NotImplementedError("Implement forward")
+        return self.net(x)

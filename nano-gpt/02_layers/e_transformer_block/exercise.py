@@ -84,7 +84,11 @@ class Block(nn.Module):
         # TODO: Create self.ffwd as a FeedForward layer with n_embd and dropout
         # TODO: Create self.ln1 as an nn.LayerNorm over n_embd dimensions
         # TODO: Create self.ln2 as an nn.LayerNorm over n_embd dimensions
-        raise NotImplementedError("Implement __init__")
+        head_size = n_embd // n_head
+        self.sa = MultiHeadAttention(n_embd, n_head, head_size, block_size, dropout)
+        self.ffwd = FeedForward(n_embd, dropout)
+        self.ln1 = nn.LayerNorm(n_embd)
+        self.ln2 = nn.LayerNorm(n_embd)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
@@ -99,4 +103,6 @@ class Block(nn.Module):
         2. Apply layer norm (ln2) to x, pass through feed-forward (ffwd), then add residual (x) back
         """
         # TODO: Implement the forward pass with residual connections
-        raise NotImplementedError("Implement forward")
+        x = x + self.sa(self.ln1(x))
+        x = x + self.ffwd(self.ln2(x))
+        return x

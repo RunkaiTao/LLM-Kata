@@ -60,7 +60,9 @@ class MultiHeadAttention(nn.Module):
         #       (each with n_embd, head_size, block_size, dropout)
         # TODO: Create self.proj as a linear layer projecting from head_size * n_head back to n_embd (use nn.Linear)
         # TODO: Create self.dropout using nn.Dropout with the given dropout rate
-        raise NotImplementedError("Implement __init__")
+        self.heads = nn.ModuleList([Head(n_embd, head_size, block_size, dropout) for _ in range(n_head)])
+        self.proj = nn.Linear(head_size * n_head, n_embd)
+        self.dropout = nn.Dropout(dropout)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
@@ -75,5 +77,7 @@ class MultiHeadAttention(nn.Module):
         2. Apply the projection linear layer.
         3. Apply dropout.
         """
-        # TODO: Implement the forward pass
-        raise NotImplementedError("Implement forward")
+        out = torch.cat([h(x) for h in self.heads], dim=-1)
+        out = self.proj(out)
+        out = self.dropout(out)
+        return out
