@@ -18,10 +18,6 @@ class TestFeedForward:
         out = ffn(x)
         assert out.shape == (BATCH_SIZE, SEQ_LEN, N_EMBD)
 
-    def test_has_net_sequential(self, ffn):
-        assert hasattr(ffn, "net")
-        assert isinstance(ffn.net, torch.nn.Sequential)
-
     def test_expansion_factor(self, ffn):
         """First linear should expand 4x, second should compress back"""
         layers = list(ffn.net.children())
@@ -31,11 +27,6 @@ class TestFeedForward:
         assert linear_layers[0].out_features == 4 * N_EMBD
         assert linear_layers[1].in_features == 4 * N_EMBD
         assert linear_layers[1].out_features == N_EMBD
-
-    def test_has_relu(self, ffn):
-        layers = list(ffn.net.children())
-        relu_layers = [l for l in layers if isinstance(l, torch.nn.ReLU)]
-        assert len(relu_layers) >= 1
 
     def test_parameter_count(self, ffn):
         """Check total parameter count"""

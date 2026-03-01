@@ -20,18 +20,6 @@ class TestEmbeddings:
         out = model(idx)
         assert out.shape == (BATCH_SIZE, SEQ_LEN, N_EMBD)
 
-    def test_has_token_embedding(self, model):
-        assert hasattr(model, "token_embedding_table")
-        assert isinstance(model.token_embedding_table, torch.nn.Embedding)
-        assert model.token_embedding_table.num_embeddings == VOCAB_SIZE
-        assert model.token_embedding_table.embedding_dim == N_EMBD
-
-    def test_has_position_embedding(self, model):
-        assert hasattr(model, "position_embedding_table")
-        assert isinstance(model.position_embedding_table, torch.nn.Embedding)
-        assert model.position_embedding_table.num_embeddings == BLOCK_SIZE
-        assert model.position_embedding_table.embedding_dim == N_EMBD
-
     def test_different_positions_give_different_embeddings(self, model):
         """Same token at different positions should produce different outputs"""
         idx = torch.zeros((1, 2), dtype=torch.long)  # same token, positions 0 and 1

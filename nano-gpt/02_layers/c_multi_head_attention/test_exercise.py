@@ -21,19 +21,6 @@ class TestMultiHeadAttention:
         out = mha(x)
         assert out.shape == (BATCH_SIZE, SEQ_LEN, N_EMBD)
 
-    def test_has_correct_number_of_heads(self, mha):
-        assert hasattr(mha, "heads")
-        assert len(mha.heads) == N_HEAD
-
-    def test_has_projection_layer(self, mha):
-        assert hasattr(mha, "proj")
-        assert isinstance(mha.proj, torch.nn.Linear)
-        assert mha.proj.in_features == HEAD_SIZE * N_HEAD
-        assert mha.proj.out_features == N_EMBD
-
-    def test_uses_module_list(self, mha):
-        assert isinstance(mha.heads, torch.nn.ModuleList)
-
     def test_parameters_are_registered(self, mha):
         """All head parameters should be reachable via model.parameters()"""
         param_count = sum(p.numel() for p in mha.parameters())

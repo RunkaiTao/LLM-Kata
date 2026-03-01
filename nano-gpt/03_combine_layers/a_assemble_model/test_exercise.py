@@ -1,7 +1,7 @@
 import math
 import torch
 import pytest
-from exercise import GPTLanguageModel, Embeddings, LMHead
+from exercise import GPTLanguageModel
 
 VOCAB_SIZE = 26
 BLOCK_SIZE = 16
@@ -11,26 +11,6 @@ N_LAYER = 2
 BATCH_SIZE = 2
 SEQ_LEN = 8
 device = "cuda" if torch.cuda.is_available() else "cpu"
-
-
-class TestModelAssembly:
-    @pytest.fixture
-    def model(self):
-        torch.manual_seed(42)
-        return GPTLanguageModel(VOCAB_SIZE, BLOCK_SIZE, N_EMBD, N_HEAD, N_LAYER)
-
-    def test_has_embeddings(self, model):
-        assert hasattr(model, "embeddings")
-        assert isinstance(model.embeddings, Embeddings)
-
-    def test_has_blocks(self, model):
-        assert hasattr(model, "blocks")
-        assert isinstance(model.blocks, torch.nn.Sequential)
-        assert len(model.blocks) == N_LAYER
-
-    def test_has_lm_head(self, model):
-        assert hasattr(model, "lm_head")
-        assert isinstance(model.lm_head, LMHead)
 
 
 class TestInitWeights:

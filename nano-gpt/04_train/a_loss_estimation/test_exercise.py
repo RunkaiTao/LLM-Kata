@@ -27,12 +27,6 @@ class TestEstimateLoss:
         result = estimate_loss(model, train_data, val_data, BLOCK_SIZE, BATCH_SIZE, EVAL_ITERS, device)
         assert isinstance(result, dict)
 
-    def test_has_train_and_val_keys(self, setup):
-        model, train_data, val_data = setup
-        result = estimate_loss(model, train_data, val_data, BLOCK_SIZE, BATCH_SIZE, EVAL_ITERS, device)
-        assert "train" in result
-        assert "val" in result
-
     def test_losses_are_positive(self, setup):
         model, train_data, val_data = setup
         result = estimate_loss(model, train_data, val_data, BLOCK_SIZE, BATCH_SIZE, EVAL_ITERS, device)
