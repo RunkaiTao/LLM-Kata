@@ -20,5 +20,5 @@ Implement `GPTLanguageModel.generate()` in `exercise.py`. The full model with `_
 ## Verify
 
 ```bash
-pytest nano-gpt/06_inference/a_generate/test_exercise.py -v
+pytest nano-gpt/05_inference/a_generate/test_exercise.py -v
 ```

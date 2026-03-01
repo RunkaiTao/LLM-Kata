@@ -17,5 +17,5 @@ Implement `estimate_loss()` in `exercise.py`. The full model and `get_batch` fun
 ## Verify
 
 ```bash
-pytest nano-gpt/05_train/a_loss_estimation/test_exercise.py -v
+pytest nano-gpt/04_train/a_loss_estimation/test_exercise.py -v
 ```

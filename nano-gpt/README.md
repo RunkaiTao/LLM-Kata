@@ -4,6 +4,39 @@ Build a GPT language model from scratch, one exercise at a time. Each exercise i
 
 Based on Andrej Karpathy's [nanoGPT](https://github.com/karpathy/nanoGPT).
 
+## Architecture
+
+```
+  Input Tokens
+       |
+       v
+ +--------------+
+ |  Embeddings  |  tok_emb + pos_emb              (02/a)
+ +------+-------+
+        |
+        v
+ +-------------------------------+
+ |   Transformer Block  x N     |                 (02/e)
+ |                               |
+ |   x --> LN --> MultiHead ---+ |    (02/b,c)
+ |   |          Attention      | |
+ |   +------------ + <--------+ |
+ |                  |            |
+ |   x --> LN --> FeedForward -+ |    (02/d)
+ |   |                         | |
+ |   +------------ + <--------+ |
+ |                  |            |
+ +------------------+------------+
+                    |
+        v
+ +--------------+
+ |   LM Head    |  LayerNorm -> Linear             (02/f)
+ +------+-------+
+        |
+        v
+  Output Logits
+```
+
 ## Environment Setup
 
 ```bash
@@ -17,7 +50,7 @@ pip install torch pytest
 
 ## How to Use
 
-1. Work through the exercises in order (01 → 06, a → b → c within each section)
+1. Work through the exercises in order (01 → 05, a → b → c within each section)
 2. Open the `README.md` in each exercise folder — it explains the concept and what to implement
 3. Fill in the functions/classes in `exercise.py` (look for `raise NotImplementedError`)
 4. Run the tests to check your work:
@@ -39,16 +72,14 @@ pytest test_exercise.py -v
 - **c_multi_head_attention** — Multiple attention heads in parallel, concatenated and projected
 - **d_feed_forward** — Position-wise feed-forward network (expand 4x, ReLU, compress)
 - **e_transformer_block** — Pre-LayerNorm transformer block with residual connections
+- **f_lm_head** — Final LayerNorm and linear projection to vocabulary logits
 
 ### 03 Combine Layers
-- **a_assemble_model** — Wire all components into the full GPTLanguageModel, initialize weights
+- **a_assemble_model** — Wire all components into the full GPTLanguageModel, initialize weights, implement forward pass
 
-### 04 Output
-- **a_forward_pass** — Complete forward pass from token indices to logits and cross-entropy loss
-
-### 05 Train
+### 04 Train
 - **a_loss_estimation** — Evaluate average loss on train/val splits with gradients disabled
 - **b_training_loop** — AdamW optimizer, forward/backward pass, periodic evaluation
 
-### 06 Inference
+### 05 Inference
 - **a_generate** — Autoregressive text generation with multinomial sampling

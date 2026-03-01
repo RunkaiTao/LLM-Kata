@@ -21,5 +21,5 @@ Implement `train_model()` in `exercise.py`. The full model, `get_batch`, and `es
 ## Verify
 
 ```bash
-pytest nano-gpt/05_train/b_training_loop/test_exercise.py -v
+pytest nano-gpt/04_train/b_training_loop/test_exercise.py -v
 ```
