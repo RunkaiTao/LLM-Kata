@@ -1,36 +1,19 @@
 """
 Multi-head attention: multiple self-attention heads in parallel.
 """
+import sys
+from pathlib import Path
+
 import torch
 import torch.nn as nn
-from torch.nn import functional as F
-
 
 # ---------------------------------------------------------------------------
-# PROVIDED: Single attention head (do not modify)
+# Import completed exercise: Head from 02/b_self_attention
 # ---------------------------------------------------------------------------
-class Head(nn.Module):
-    """One head of self-attention."""
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from _load import load
 
-    def __init__(self, n_embd: int, head_size: int, block_size: int, dropout: float = 0.0):
-        super().__init__()
-        self.key = nn.Linear(n_embd, head_size, bias=False)
-        self.query = nn.Linear(n_embd, head_size, bias=False)
-        self.value = nn.Linear(n_embd, head_size, bias=False)
-        self.register_buffer("tril", torch.tril(torch.ones(block_size, block_size)))
-        self.dropout = nn.Dropout(dropout)
-
-    def forward(self, x):
-        B, T, C = x.shape
-        k = self.key(x)
-        q = self.query(x)
-        wei = q @ k.transpose(-2, -1) * k.shape[-1] ** -0.5
-        wei = wei.masked_fill(self.tril[:T, :T] == 0, float("-inf"))
-        wei = F.softmax(wei, dim=-1)
-        wei = self.dropout(wei)
-        v = self.value(x)
-        out = wei @ v
-        return out
+Head = load("02_layers", "b_self_attention").Head
 
 
 # ---------------------------------------------------------------------------
