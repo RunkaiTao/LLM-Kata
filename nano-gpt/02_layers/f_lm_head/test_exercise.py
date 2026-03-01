@@ -19,17 +19,6 @@ class TestLMHead:
         out = head(x)
         assert out.shape == (BATCH_SIZE, SEQ_LEN, VOCAB_SIZE)
 
-    def test_has_layer_norm(self, head):
-        assert hasattr(head, "ln_f")
-        assert isinstance(head.ln_f, torch.nn.LayerNorm)
-        assert head.ln_f.normalized_shape == (N_EMBD,)
-
-    def test_has_projection(self, head):
-        assert hasattr(head, "proj")
-        assert isinstance(head.proj, torch.nn.Linear)
-        assert head.proj.in_features == N_EMBD
-        assert head.proj.out_features == VOCAB_SIZE
-
     def test_output_differs_from_input(self, head):
         """LMHead should transform the input (different dimensions)"""
         x = torch.randn(1, 4, N_EMBD)

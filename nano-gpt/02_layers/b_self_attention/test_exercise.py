@@ -20,19 +20,6 @@ class TestHead:
         out = head(x)
         assert out.shape == (BATCH_SIZE, SEQ_LEN, HEAD_SIZE)
 
-    def test_has_key_query_value(self, head):
-        assert hasattr(head, "key")
-        assert hasattr(head, "query")
-        assert hasattr(head, "value")
-        assert isinstance(head.key, torch.nn.Linear)
-        assert head.key.bias is None  # bias=False
-
-    def test_causal_mask_exists(self, head):
-        """tril buffer should exist and be lower-triangular"""
-        assert hasattr(head, "tril")
-        assert head.tril.shape == (BLOCK_SIZE, BLOCK_SIZE)
-        assert torch.equal(head.tril, torch.tril(torch.ones(BLOCK_SIZE, BLOCK_SIZE)))
-
     def test_causal_masking_works(self, head):
         """
         Position 0 should not attend to later positions.

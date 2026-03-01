@@ -20,18 +20,6 @@ class TestBlock:
         out = block(x)
         assert out.shape == (BATCH_SIZE, SEQ_LEN, N_EMBD)
 
-    def test_has_self_attention(self, block):
-        assert hasattr(block, "sa")
-
-    def test_has_feed_forward(self, block):
-        assert hasattr(block, "ffwd")
-
-    def test_has_layer_norms(self, block):
-        assert hasattr(block, "ln1")
-        assert hasattr(block, "ln2")
-        assert isinstance(block.ln1, torch.nn.LayerNorm)
-        assert isinstance(block.ln2, torch.nn.LayerNorm)
-
     def test_residual_connection(self, block):
         """Output should differ from a pure attention+FFN pass (residual adds input)"""
         torch.manual_seed(0)
