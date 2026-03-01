@@ -22,9 +22,8 @@ class LMHead(nn.Module):
             vocab_size: Number of tokens in the vocabulary (output size).
         """
         super().__init__()
-        # TODO: Create self.ln_f as an nn.LayerNorm over n_embd dimensions
-        # TODO: Create self.proj as an nn.Linear mapping n_embd to vocab_size
-        raise NotImplementedError("Implement __init__")
+        self.ln_f = nn.LayerNorm(n_embd)
+        self.proj = nn.Linear(n_embd, vocab_size)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
@@ -39,5 +38,6 @@ class LMHead(nn.Module):
         2. Project through the linear layer -> (B, T, vocab_size)
         3. Return the logits
         """
-        # TODO: Implement the forward pass
-        raise NotImplementedError("Implement forward")
+        x = self.ln_f(x)
+        logits = self.proj(x)
+        return logits
