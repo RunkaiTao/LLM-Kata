@@ -51,4 +51,15 @@ def estimate_loss(model, train_data, val_data, block_size, batch_size, eval_iter
     5. Return the output dict.
     """
     # TODO: Implement loss estimation
-    raise NotImplementedError("Implement estimate_loss")
+    out = {}
+    model.eval()
+    for split in ['train', 'val']:
+        data = train_data if split == 'train' else val_data
+        losses = torch.zeros(eval_iters)
+        for k in range(eval_iters):
+            X, Y = get_batch(data, block_size, batch_size, device)
+            logits, loss = model(X, Y)
+            losses[k] = loss
+        out[split] = losses.mean()
+    model.train()
+    return out

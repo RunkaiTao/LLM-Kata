@@ -64,5 +64,17 @@ def train_model(
        f. Step the optimizer.
     4. Return the list of recorded losses.
     """
-    # TODO: Implement the training loop
-    raise NotImplementedError("Implement train_model")
+    optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate)
+    loss_records = []
+
+    for iter in range(max_iters):
+        if iter % eval_interval == 0 or iter == max_iters - 1:
+            loss_records.append(estimate_loss(model, train_data, val_data, block_size, batch_size, eval_iters, device))
+
+        xb, yb = get_batch(train_data, block_size, batch_size, device)
+        logits, loss = model(xb, yb)
+        optimizer.zero_grad(set_to_none=True)
+        loss.backward()
+        optimizer.step()
+
+    return loss_records

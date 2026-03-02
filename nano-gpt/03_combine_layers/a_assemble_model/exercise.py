@@ -41,7 +41,11 @@ class GPTLanguageModel(nn.Module):
         #       (each with n_embd, n_head, block_size, dropout)
         # TODO: Create self.lm_head as an LMHead layer (n_embd, vocab_size)
         # TODO: Apply weight initialization by calling self.apply with self._init_weights
-        raise NotImplementedError("Implement __init__")
+        self.block_size = block_size
+        self.embeddings = Embeddings(vocab_size, block_size, n_embd)
+        self.blocks = nn.Sequential(*[Block(n_embd, n_head, block_size, dropout) for _ in range(n_layer)])
+        self.lm_head = LMHead(n_embd, vocab_size)
+        self.apply(self._init_weights)
 
     def _init_weights(self, module):
         """
@@ -54,8 +58,12 @@ class GPTLanguageModel(nn.Module):
 
         Hint: Use torch.nn.init.normal_() and torch.nn.init.zeros_()
         """
-        # TODO: Implement weight initialization
-        raise NotImplementedError("Implement _init_weights")
+        if isinstance(module, nn.Linear):
+            torch.nn.init.normal_(module.weight, mean=0.0, std=0.02)
+            if module.bias is not None:
+                torch.nn.init.zeros_(module.bias)
+        elif isinstance(module, nn.Embedding):
+            torch.nn.init.normal_(module.weight, mean=0.0, std=0.02)
 
     def forward(self, idx, targets=None):
         """
@@ -80,4 +88,13 @@ class GPTLanguageModel(nn.Module):
         5. Return (logits, loss)
         """
         # TODO: Implement the forward pass
-        raise NotImplementedError("Implement forward")
+        x = self.embeddings(idx)
+        x = self.blocks(x)
+        logits = self.lm_head(x)
+        loss = None
+        if targets is not None:
+            B, T, C = logits.shape
+            logits = logits.view(B * T, C)
+            targets = targets.view(B * T)
+            loss = F.cross_entropy(logits, targets)
+        return logits, loss

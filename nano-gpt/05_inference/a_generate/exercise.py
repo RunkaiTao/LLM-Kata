@@ -47,4 +47,12 @@ class GPTLanguageModel(_GPTBase):
         2. Return idx
         """
         # TODO: Implement autoregressive generation
-        raise NotImplementedError("Implement generate")
+        for _ in range(max_new_tokens):
+            idx_cond = idx[:, -self.block_size:]
+            logits, _ = self(idx_cond)
+            logits_last = logits[:, -1, :]
+            probs = F.softmax(logits_last, dim=-1)
+            idx_next = torch.multinomial(probs, num_samples=1)
+            idx = torch.cat((idx, idx_next), dim=1)
+        
+        return idx
