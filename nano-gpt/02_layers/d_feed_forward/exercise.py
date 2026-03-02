@@ -36,3 +36,5 @@ class FeedForward(nn.Module):
         """
         # TODO: Implement the forward pass
         raise NotImplementedError("Implement forward")
+
+# Run tests: pytest nano-gpt/02_layers/d_feed_forward/test_exercise.py -v

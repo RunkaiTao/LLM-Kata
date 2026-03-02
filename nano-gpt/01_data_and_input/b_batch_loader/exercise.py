@@ -57,3 +57,8 @@ def get_batch(
     """
     # TODO: Implement this function
     raise NotImplementedError("Implement get_batch")
+
+# Run tests: pytest nano-gpt/01_data_and_input/b_batch_loader/test_exercise.py -v
+# Test individual functions:
+# pytest nano-gpt/01_data_and_input/b_batch_loader/test_exercise.py -v -k TestPrepareData
+# pytest nano-gpt/01_data_and_input/b_batch_loader/test_exercise.py -v -k TestGetBatch

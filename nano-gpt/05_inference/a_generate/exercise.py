@@ -48,3 +48,5 @@ class GPTLanguageModel(_GPTBase):
         """
         # TODO: Implement autoregressive generation
         raise NotImplementedError("Implement generate")
+
+# Run tests: pytest nano-gpt/05_inference/a_generate/test_exercise.py -v

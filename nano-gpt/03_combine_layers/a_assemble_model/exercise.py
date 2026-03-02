@@ -81,3 +81,9 @@ class GPTLanguageModel(nn.Module):
         """
         # TODO: Implement the forward pass
         raise NotImplementedError("Implement forward")
+
+# Run tests: pytest nano-gpt/03_combine_layers/a_assemble_model/test_exercise.py -v
+# Test individual parts:
+# pytest nano-gpt/03_combine_layers/a_assemble_model/test_exercise.py -v -k TestModelAssembly
+# pytest nano-gpt/03_combine_layers/a_assemble_model/test_exercise.py -v -k TestInitWeights
+# pytest nano-gpt/03_combine_layers/a_assemble_model/test_exercise.py -v -k TestForwardPass

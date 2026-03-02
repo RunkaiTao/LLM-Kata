@@ -55,3 +55,9 @@ def decode(token_ids: list[int], itos: dict) -> str:
     """
     # TODO: Implement this function
     raise NotImplementedError("Implement decode")
+
+# Run tests: pytest nano-gpt/01_data_and_input/a_tokenizer/test_exercise.py -v
+# Test individual functions:
+# pytest nano-gpt/01_data_and_input/a_tokenizer/test_exercise.py -v -k TestBuildVocab
+# pytest nano-gpt/01_data_and_input/a_tokenizer/test_exercise.py -v -k TestEncode
+# pytest nano-gpt/01_data_and_input/a_tokenizer/test_exercise.py -v -k TestDecode

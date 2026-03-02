@@ -66,3 +66,5 @@ def train_model(
     """
     # TODO: Implement the training loop
     raise NotImplementedError("Implement train_model")
+
+# Run tests: pytest nano-gpt/04_train/b_training_loop/test_exercise.py -v

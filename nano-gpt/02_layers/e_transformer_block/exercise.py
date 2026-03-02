@@ -53,3 +53,5 @@ class Block(nn.Module):
         """
         # TODO: Implement the forward pass with residual connections
         raise NotImplementedError("Implement forward")
+
+# Run tests: pytest nano-gpt/02_layers/e_transformer_block/test_exercise.py -v

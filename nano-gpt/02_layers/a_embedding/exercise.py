@@ -42,3 +42,5 @@ class Embeddings(nn.Module):
         """
         # TODO: Implement the forward pass
         raise NotImplementedError("Implement forward")
+
+# Run tests: pytest nano-gpt/02_layers/a_embedding/test_exercise.py -v

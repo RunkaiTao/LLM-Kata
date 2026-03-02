@@ -48,3 +48,5 @@ class Head(nn.Module):
         """
         # TODO: Implement the forward pass
         raise NotImplementedError("Implement forward")
+
+# Run tests: pytest nano-gpt/02_layers/b_self_attention/test_exercise.py -v

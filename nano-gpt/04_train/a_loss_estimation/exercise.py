@@ -52,3 +52,5 @@ def estimate_loss(model, train_data, val_data, block_size, batch_size, eval_iter
     """
     # TODO: Implement loss estimation
     raise NotImplementedError("Implement estimate_loss")
+
+# Run tests: pytest nano-gpt/04_train/a_loss_estimation/test_exercise.py -v
