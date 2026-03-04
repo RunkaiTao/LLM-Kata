@@ -23,8 +23,13 @@ def build_vocab(text: str) -> tuple[dict, dict, int]:
     Returns:
         A tuple of (stoi, itos, vocab_size).
     """
-    # TODO: Implement this function
-    raise NotImplementedError("Implement build_vocab")
+    # TODO: Implement build_vocab following the steps above
+    # Step 1: chars = ...       (sorted list of unique characters from text)
+    # Step 2: stoi = ...        (dict: char -> index)
+    # Step 3: itos = ...        (dict: index -> char)
+    # Step 4: vocab_size = ...  (number of unique characters)
+    # return (stoi, itos, vocab_size)
+    pass
 
 
 def encode(s: str, stoi: dict) -> list[int]:
@@ -38,8 +43,9 @@ def encode(s: str, stoi: dict) -> list[int]:
     Returns:
         A list of integers representing the encoded string.
     """
-    # TODO: Implement this function
-    raise NotImplementedError("Implement encode")
+    # TODO: Implement encode
+    # return ...  (list comprehension: stoi[c] for each character c in s)
+    pass
 
 
 def decode(token_ids: list[int], itos: dict) -> str:
@@ -53,8 +59,9 @@ def decode(token_ids: list[int], itos: dict) -> str:
     Returns:
         The decoded string.
     """
-    # TODO: Implement this function
-    raise NotImplementedError("Implement decode")
+    # TODO: Implement decode
+    # return ...  (join itos[i] for each token i in token_ids)
+    pass
 
 # Run tests: pytest nano-gpt/01_data_and_input/a_tokenizer/test_exercise.py -v
 # Test individual functions:

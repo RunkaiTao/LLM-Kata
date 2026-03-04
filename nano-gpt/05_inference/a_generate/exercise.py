@@ -46,7 +46,15 @@ class GPTLanguageModel(_GPTBase):
               (use torch.cat) -> (B, T+1)
         2. Return idx
         """
-        # TODO: Implement autoregressive generation
-        raise NotImplementedError("Implement generate")
+        # TODO: Implement generate following the steps above
+        # Step 1: for _ in range(max_new_tokens):
+        #     a. idx_cond = ...  (idx[:, -self.block_size:])
+        #     b. logits, _ = ... (self(idx_cond))
+        #     c. logits = ...    (logits[:, -1, :])
+        #     d. probs = ...     (F.softmax(logits, dim=-1))
+        #     e. idx_next = ...  (torch.multinomial(probs, num_samples=1))
+        #     f. idx = ...       (torch.cat((idx, idx_next), dim=1))
+        # Step 2: return idx
+        pass
 
 # Run tests: pytest nano-gpt/05_inference/a_generate/test_exercise.py -v

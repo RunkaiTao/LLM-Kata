@@ -35,13 +35,13 @@ class GPTLanguageModel(nn.Module):
             dropout: Dropout rate.
         """
         super().__init__()
-        # TODO: Store block_size as self.block_size for later use
-        # TODO: Create self.embeddings as an Embeddings layer (vocab_size, block_size, n_embd)
-        # TODO: Create self.blocks as an nn.Sequential of n_layer Block instances
-        #       (each with n_embd, n_head, block_size, dropout)
-        # TODO: Create self.lm_head as an LMHead layer (n_embd, vocab_size)
-        # TODO: Apply weight initialization by calling self.apply with self._init_weights
-        raise NotImplementedError("Implement __init__")
+        # TODO: Implement __init__ following the docstring above
+        # Step 1: self.block_size = ...   (store block_size)
+        # Step 2: self.embeddings = ...   (Embeddings(vocab_size, block_size, n_embd))
+        # Step 3: self.blocks = ...       (nn.Sequential(*[Block(n_embd, n_head, block_size, dropout) for _ in range(n_layer)]))
+        # Step 4: self.lm_head = ...      (LMHead(n_embd, vocab_size))
+        # Step 5: self.apply(self._init_weights)
+        pass
 
     def _init_weights(self, module):
         """
@@ -54,8 +54,10 @@ class GPTLanguageModel(nn.Module):
 
         Hint: Use torch.nn.init.normal_() and torch.nn.init.zeros_()
         """
-        # TODO: Implement weight initialization
-        raise NotImplementedError("Implement _init_weights")
+        # TODO: Implement _init_weights following the rules above
+        # Step 1: if isinstance(module, nn.Linear): init weights Normal(0, 0.02), bias zeros if exists
+        # Step 2: if isinstance(module, nn.Embedding): init weights Normal(0, 0.02)
+        pass
 
     def forward(self, idx, targets=None):
         """
@@ -79,8 +81,14 @@ class GPTLanguageModel(nn.Module):
               loss = None
         5. Return (logits, loss)
         """
-        # TODO: Implement the forward pass
-        raise NotImplementedError("Implement forward")
+        # TODO: Implement forward following the steps above
+        # Step 1: x = ...       (self.embeddings(idx))
+        # Step 2: x = ...       (self.blocks(x))
+        # Step 3: logits = ...  (self.lm_head(x))
+        # Step 4: if targets is not None: reshape logits to (B*T, C), targets to (B*T), compute loss = F.cross_entropy(...)
+        #         else: loss = None
+        # Step 5: return (logits, loss)
+        pass
 
 # Run tests: pytest nano-gpt/03_combine_layers/a_assemble_model/test_exercise.py -v
 # Test individual parts:

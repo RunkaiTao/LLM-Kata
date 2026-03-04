@@ -32,12 +32,13 @@ class Block(nn.Module):
             dropout: Dropout rate.
         """
         super().__init__()
-        # TODO: Compute head_size by integer-dividing n_embd by n_head
-        # TODO: Create self.sa as a MultiHeadAttention layer with n_embd, n_head, head_size, block_size, dropout
-        # TODO: Create self.ffwd as a FeedForward layer with n_embd and dropout
-        # TODO: Create self.ln1 as an nn.LayerNorm over n_embd dimensions
-        # TODO: Create self.ln2 as an nn.LayerNorm over n_embd dimensions
-        raise NotImplementedError("Implement __init__")
+        # TODO: Implement __init__ following the docstring above
+        # Step 1: head_size = ...  (n_embd // n_head)
+        # Step 2: self.sa = ...    (MultiHeadAttention(n_embd, n_head, head_size, block_size, dropout))
+        # Step 3: self.ffwd = ...  (FeedForward(n_embd, dropout))
+        # Step 4: self.ln1 = ...   (nn.LayerNorm(n_embd))
+        # Step 5: self.ln2 = ...   (nn.LayerNorm(n_embd))
+        pass
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
@@ -51,7 +52,10 @@ class Block(nn.Module):
         1. Apply layer norm (ln1) to x, pass through self-attention (sa), then add residual (x) back
         2. Apply layer norm (ln2) to x, pass through feed-forward (ffwd), then add residual (x) back
         """
-        # TODO: Implement the forward pass with residual connections
-        raise NotImplementedError("Implement forward")
+        # TODO: Implement forward following the steps above
+        # Step 1: x = ...  (x + self.sa(self.ln1(x)))
+        # Step 2: x = ...  (x + self.ffwd(self.ln2(x)))
+        # return x
+        pass
 
 # Run tests: pytest nano-gpt/02_layers/e_transformer_block/test_exercise.py -v

@@ -39,11 +39,11 @@ class MultiHeadAttention(nn.Module):
             dropout: Dropout rate.
         """
         super().__init__()
-        # TODO: Create self.heads as an nn.ModuleList containing n_head Head instances
-        #       (each with n_embd, head_size, block_size, dropout)
-        # TODO: Create self.proj as a linear layer projecting from head_size * n_head back to n_embd (use nn.Linear)
-        # TODO: Create self.dropout using nn.Dropout with the given dropout rate
-        raise NotImplementedError("Implement __init__")
+        # TODO: Implement __init__ following the docstring above
+        # Step 1: self.heads = ...    (nn.ModuleList of n_head Head(n_embd, head_size, block_size, dropout))
+        # Step 2: self.proj = ...     (nn.Linear: head_size * n_head -> n_embd)
+        # Step 3: self.dropout = ...  (nn.Dropout(dropout))
+        pass
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
@@ -58,7 +58,11 @@ class MultiHeadAttention(nn.Module):
         2. Apply the projection linear layer.
         3. Apply dropout.
         """
-        # TODO: Implement the forward pass
-        raise NotImplementedError("Implement forward")
+        # TODO: Implement forward following the steps above
+        # Step 1: out = ...  (torch.cat([h(x) for h in self.heads], dim=-1))
+        # Step 2: out = ...  (self.proj(out))
+        # Step 3: out = ...  (self.dropout(out))
+        # return out
+        pass
 
 # Run tests: pytest nano-gpt/02_layers/c_multi_head_attention/test_exercise.py -v

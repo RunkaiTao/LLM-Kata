@@ -22,9 +22,10 @@ class LMHead(nn.Module):
             vocab_size: Number of tokens in the vocabulary (output size).
         """
         super().__init__()
-        # TODO: Create self.ln_f as an nn.LayerNorm over n_embd dimensions
-        # TODO: Create self.proj as an nn.Linear mapping n_embd to vocab_size
-        raise NotImplementedError("Implement __init__")
+        # TODO: Implement __init__ following the docstring above
+        # Step 1: self.ln_f = ...   (nn.LayerNorm(n_embd))
+        # Step 2: self.proj = ...   (nn.Linear: n_embd -> vocab_size)
+        pass
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
@@ -39,7 +40,10 @@ class LMHead(nn.Module):
         2. Project through the linear layer -> (B, T, vocab_size)
         3. Return the logits
         """
-        # TODO: Implement the forward pass
-        raise NotImplementedError("Implement forward")
+        # TODO: Implement forward following the steps above
+        # Step 1: x = ...       (self.ln_f(x))
+        # Step 2: logits = ...  (self.proj(x))
+        # Step 3: return logits
+        pass
 
 # Run tests: pytest nano-gpt/02_layers/f_lm_head/test_exercise.py -v

@@ -18,13 +18,13 @@ class Head(nn.Module):
             dropout: Dropout rate for attention weights.
         """
         super().__init__()
-        # TODO: Create self.key as a linear projection from n_embd to head_size, no bias (use nn.Linear)
-        # TODO: Create self.query as a linear projection from n_embd to head_size, no bias (use nn.Linear)
-        # TODO: Create self.value as a linear projection from n_embd to head_size, no bias (use nn.Linear)
-        # TODO: Register a buffer named 'tril' containing a lower-triangular matrix of ones,
-        #       size block_size x block_size (use register_buffer, torch.tril, torch.ones)
-        # TODO: Create self.dropout using nn.Dropout with the given dropout rate
-        raise NotImplementedError("Implement __init__")
+        # TODO: Implement __init__ following the docstring above
+        # Step 1: self.key = ...      (nn.Linear: n_embd -> head_size, bias=False)
+        # Step 2: self.query = ...    (nn.Linear: n_embd -> head_size, bias=False)
+        # Step 3: self.value = ...    (nn.Linear: n_embd -> head_size, bias=False)
+        # Step 4: self.register_buffer('tril', ...)  (torch.tril(torch.ones(block_size, block_size)))
+        # Step 5: self.dropout = ...  (nn.Dropout(dropout))
+        pass
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
@@ -46,7 +46,17 @@ class Head(nn.Module):
         8. Compute v by passing x through the value projection -> (B, T, head_size)
         9. Compute output out as the matrix product of wei and v -> (B, T, head_size)
         """
-        # TODO: Implement the forward pass
-        raise NotImplementedError("Implement forward")
+        # TODO: Implement forward following the steps above
+        # Step 1: B, T, C = ...  (x.shape)
+        # Step 2: k = ...        (self.key(x))
+        # Step 3: q = ...        (self.query(x))
+        # Step 4: wei = ...      (q @ k.transpose(-2,-1) * C**-0.5)
+        # Step 5: wei = ...      (wei.masked_fill(self.tril[:T,:T] == 0, float('-inf')))
+        # Step 6: wei = ...      (F.softmax(wei, dim=-1))
+        # Step 7: wei = ...      (self.dropout(wei))
+        # Step 8: v = ...        (self.value(x))
+        # Step 9: out = ...      (wei @ v)
+        # return out
+        pass
 
 # Run tests: pytest nano-gpt/02_layers/b_self_attention/test_exercise.py -v

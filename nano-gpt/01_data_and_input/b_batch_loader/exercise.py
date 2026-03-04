@@ -25,8 +25,12 @@ def prepare_data(
     Returns:
         A tuple of (train_data, val_data), both torch.long tensors.
     """
-    # TODO: Implement this function
-    raise NotImplementedError("Implement prepare_data")
+    # TODO: Implement prepare_data following the steps above
+    # Step 1: data = ...        (torch.tensor(encoded_text, dtype=torch.long))
+    # Step 2: n = ...           (int(train_fraction * len(data)))
+    # Step 3: train_data, val_data = ...  (data[:n], data[n:])
+    # return (train_data, val_data)
+    pass
 
 
 def get_batch(
@@ -55,8 +59,13 @@ def get_batch(
     Returns:
         A tuple (x, y) where both are (batch_size, block_size) tensors.
     """
-    # TODO: Implement this function
-    raise NotImplementedError("Implement get_batch")
+    # TODO: Implement get_batch following the steps above
+    # Step 1: ix = ...   (torch.randint(len(data) - block_size, (batch_size,)))
+    # Step 2: x = ...    (torch.stack([data[i:i+block_size] for i in ix]))
+    # Step 3: y = ...    (torch.stack([data[i+1:i+1+block_size] for i in ix]))
+    # Step 4: x, y = ...  (x.to(device), y.to(device))
+    # return (x, y)
+    pass
 
 # Run tests: pytest nano-gpt/01_data_and_input/b_batch_loader/test_exercise.py -v
 # Test individual functions:

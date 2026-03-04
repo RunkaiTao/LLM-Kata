@@ -22,9 +22,10 @@ class Embeddings(nn.Module):
             n_embd: Embedding dimension.
         """
         super().__init__()
-        # TODO: Create self.token_embedding_table as an nn.Embedding mapping vocab_size tokens to n_embd dimensions
-        # TODO: Create self.position_embedding_table as an nn.Embedding mapping block_size positions to n_embd dimensions
-        raise NotImplementedError("Implement __init__")
+        # TODO: Implement __init__ following the docstring above
+        # Step 1: self.token_embedding_table = ...     (nn.Embedding: vocab_size -> n_embd)
+        # Step 2: self.position_embedding_table = ...  (nn.Embedding: block_size -> n_embd)
+        pass
 
     def forward(self, idx: torch.Tensor) -> torch.Tensor:
         """
@@ -40,7 +41,11 @@ class Embeddings(nn.Module):
         3. Look up pos_emb by passing position indices through the position embedding table -> (T, C)
         4. Return the sum of tok_emb and pos_emb (broadcasting aligns shapes) -> (B, T, C)
         """
-        # TODO: Implement the forward pass
-        raise NotImplementedError("Implement forward")
+        # TODO: Implement forward following the steps above
+        # Step 1: tok_emb = ...  (self.token_embedding_table(idx))
+        # Step 2: pos = ...      (torch.arange(T, device=idx.device))
+        # Step 3: pos_emb = ...  (self.position_embedding_table(pos))
+        # Step 4: return ...     (tok_emb + pos_emb)
+        pass
 
 # Run tests: pytest nano-gpt/02_layers/a_embedding/test_exercise.py -v

@@ -64,7 +64,17 @@ def train_model(
        f. Step the optimizer.
     4. Return the list of recorded losses.
     """
-    # TODO: Implement the training loop
-    raise NotImplementedError("Implement train_model")
+    # TODO: Implement train_model following the steps above
+    # Step 1: optimizer = ...  (torch.optim.AdamW(model.parameters(), lr=learning_rate))
+    # Step 2: loss_history = []
+    # Step 3: for iter in range(max_iters):
+    #     a. if iter % eval_interval == 0 or iter == max_iters - 1: losses = estimate_loss(...); loss_history.append(losses)
+    #     b. xb, yb = get_batch(train_data, block_size, batch_size, device)
+    #     c. logits, loss = model(xb, yb)
+    #     d. optimizer.zero_grad(set_to_none=True)
+    #     e. loss.backward()
+    #     f. optimizer.step()
+    # Step 4: return loss_history
+    pass
 
 # Run tests: pytest nano-gpt/04_train/b_training_loop/test_exercise.py -v

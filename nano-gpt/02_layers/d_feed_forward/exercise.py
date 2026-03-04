@@ -19,12 +19,14 @@ class FeedForward(nn.Module):
             dropout: Dropout rate.
         """
         super().__init__()
-        # TODO: Create self.net as an nn.Sequential containing:
-        #   1. A linear layer expanding from n_embd to 4 * n_embd (use nn.Linear)
-        #   2. A ReLU activation (use nn.ReLU)
-        #   3. A linear layer projecting from 4 * n_embd back to n_embd (use nn.Linear)
-        #   4. A dropout layer (use nn.Dropout)
-        raise NotImplementedError("Implement __init__")
+        # TODO: Implement __init__ following the docstring above
+        # self.net = nn.Sequential(
+        #     Step 1: ...  (nn.Linear: n_embd -> 4 * n_embd)
+        #     Step 2: ...  (nn.ReLU())
+        #     Step 3: ...  (nn.Linear: 4 * n_embd -> n_embd)
+        #     Step 4: ...  (nn.Dropout(dropout))
+        # )
+        pass
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
@@ -34,7 +36,8 @@ class FeedForward(nn.Module):
         Returns:
             Output tensor of shape (B, T, n_embd).
         """
-        # TODO: Implement the forward pass
-        raise NotImplementedError("Implement forward")
+        # TODO: Implement forward
+        # return self.net(x)
+        pass
 
 # Run tests: pytest nano-gpt/02_layers/d_feed_forward/test_exercise.py -v

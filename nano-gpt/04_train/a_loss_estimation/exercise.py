@@ -50,7 +50,16 @@ def estimate_loss(model, train_data, val_data, block_size, batch_size, eval_iter
     4. Set model back to training mode (use model.train()).
     5. Return the output dict.
     """
-    # TODO: Implement loss estimation
-    raise NotImplementedError("Implement estimate_loss")
+    # TODO: Implement estimate_loss following the steps above
+    # Step 1: out = {}
+    # Step 2: model.eval()
+    # Step 3: for split in ['train', 'val']:
+    #     a. data = train_data if split == 'train' else val_data
+    #     b. losses = torch.zeros(eval_iters)
+    #     c. for k in range(eval_iters): X, Y = get_batch(...); _, loss = model(X, Y); losses[k] = loss.item()
+    #     d. out[split] = losses.mean()
+    # Step 4: model.train()
+    # Step 5: return out
+    pass
 
 # Run tests: pytest nano-gpt/04_train/a_loss_estimation/test_exercise.py -v
