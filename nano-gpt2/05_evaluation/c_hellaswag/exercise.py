@@ -36,38 +36,32 @@ def get_most_likely_row(tokens: torch.Tensor, mask: torch.Tensor, logits: torch.
         The index (int) of the most likely completion (0-indexed).
 
     Steps:
-    1. Shift logits to align with next-token prediction:
-       shift_logits = logits[..., :-1, :].contiguous()
-       — logits at position t predict the token at position t+1
-    2. Shift tokens similarly:
-       shift_tokens = tokens[..., 1:].contiguous()
-    3. Flatten for cross_entropy:
-       flat_shift_logits = shift_logits.view(-1, shift_logits.size(-1))
-       flat_shift_tokens = shift_tokens.view(-1)
-    4. Compute per-token loss (no reduction):
-       shift_losses = F.cross_entropy(flat_shift_logits, flat_shift_tokens, reduction='none')
-    5. Reshape losses back to (num_candidates, seq_len - 1):
-       shift_losses = shift_losses.view(tokens.size(0), -1)
-    6. Shift the mask to match:
-       shift_mask = mask[..., 1:].contiguous()
-       — the mask must be shifted because we're scoring at positions 1..T-1
-    7. Apply mask (zero out context positions):
-       masked_shift_losses = shift_losses * shift_mask
-    8. Compute average loss per completion:
-       sum_loss = masked_shift_losses.sum(dim=1)
-       avg_loss = sum_loss / shift_mask.sum(dim=1)
-    9. Return the index of the completion with the lowest average loss:
-       return avg_loss.argmin().item()
+    1. Shift logits and tokens for next-token alignment:
+       — remove the last position from logits and the first from tokens
+       so that logits[t] predicts tokens[t+1] (use [..., :-1, :] and [..., 1:])
+    2. Flatten the shifted logits and tokens, then compute per-token
+       cross-entropy loss with no reduction (use F.cross_entropy, reduction='none')
+    3. Reshape losses back to (num_candidates, seq_len - 1)
+    4. Shift the mask the same way (drop first position) so it aligns
+       with the loss positions
+    5. Zero out losses in the context region by multiplying with the shifted mask
+    6. Compute the average loss per candidate: sum masked losses and divide
+       by the number of completion tokens per candidate
+    7. Return the index of the candidate with the lowest average loss
+       (use .argmin().item())
     """
     # TODO: Implement get_most_likely_row following the steps above
-    shift_logits = logits[..., :-1, :].contiguous()
-    shift_tokens = tokens[..., 1:].contiguous()
-    flat_shift_logits = shift_logits.view(-1, shift_logits.size(-1))
-    flat_shift_tokens = shift_tokens.view(-1)
-    shift_losses = F.cross_entropy(flat_shift_logits, flat_shift_tokens, reduction="none")
-    shift_losses = shift_losses.view(tokens.size(0), -1)
-    shift_mask = mask[..., 1:].contiguous()
-    masked_shift_losses = shift_losses * shift_mask
-    sum_loss = masked_shift_losses.sum(dim=1)
-    avg_loss = sum_loss / shift_mask.sum(dim=1)
-    return avg_loss.argmin().item()
+    # Step 1: shift_logits = ...        (logits[..., :-1, :], remove last position)
+    #         shift_tokens = ...        (tokens[..., 1:], remove first position)
+    # Step 2: flat_shift_logits = ...   (flatten to (-1, vocab_size))
+    #         flat_shift_tokens = ...   (flatten to (-1,))
+    #         shift_losses = ...        (F.cross_entropy with reduction="none")
+    # Step 3: shift_losses = ...        (reshape to (num_candidates, seq_len - 1))
+    # Step 4: shift_mask = ...          (mask[..., 1:] to align with losses)
+    # Step 5: masked_shift_losses = ... (shift_losses * shift_mask)
+    # Step 6: sum_loss = ...            (sum along dim=1)
+    #         avg_loss = ...            (sum_loss / shift_mask.sum(dim=1))
+    # Step 7: return avg_loss.argmin().item()
+    pass
+
+# Run tests: pytest nano-gpt2/05_evaluation/c_hellaswag/test_exercise.py -v

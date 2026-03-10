@@ -49,29 +49,28 @@ def generate_topk(model, idx: torch.Tensor, max_new_tokens: int, top_k: int = 50
 
     Steps:
     For each of max_new_tokens iterations:
-    1. Crop idx to at most the last model.config.block_size tokens as idx_cond
-    2. Forward pass: logits, _ = model(idx_cond)
-       — logits is (B, T', vocab_size)
-    3. Extract last position: logits = logits[:, -1, :]  -> (B, vocab_size)
-    4. Convert to probabilities: probs = F.softmax(logits, dim=-1)  -> (B, vocab_size)
-    5. Get top-k: topk_probs, topk_indices = torch.topk(probs, top_k, dim=-1)
-       -> each (B, top_k)
-    6. Sample from top-k: ix = torch.multinomial(topk_probs, 1)
-       -> (B, 1)  — index into the top-k list
-    7. Map back to vocab: xcol = torch.gather(topk_indices, -1, ix)
-       -> (B, 1)  — the actual token ID
-    8. Append: idx = torch.cat((idx, xcol), dim=1)
+    1. Crop idx to the last block_size tokens to stay within context window
+    2. Forward pass on the cropped context, discard loss
+    3. Take logits at the last time step only -> (B, vocab_size)
+    4. Convert to probabilities (use F.softmax)
+    5. Select the top_k highest-probability tokens and their indices (use torch.topk)
+    6. Sample from the top-k distribution (use torch.multinomial)
+    7. Map the sampled index back to the original vocab ID (use torch.gather)
+    8. Append the new token to the sequence (use torch.cat)
 
-    Return idx
+    Return the full sequence
     """
     # TODO: Implement generate_topk following the steps above
-    for _ in range(max_new_tokens):
-        idx_cond = idx[:, -model.config.block_size:]
-        logits, _ = model(idx_cond)
-        logits = logits[:, -1, :]
-        probs = F.softmax(logits, dim=-1)
-        topk_probs, topk_indices = torch.topk(probs, top_k, dim=-1)
-        ix = torch.multinomial(topk_probs, 1)
-        xcol = torch.gather(topk_indices, -1, ix)
-        idx = torch.cat((idx, xcol), dim=1)
-    return idx
+    # for _ in range(max_new_tokens):
+    #     Step 1: idx_cond = ...              (crop idx to last block_size tokens)
+    #     Step 2: logits, _ = ...             (forward pass, discard loss)
+    #     Step 3: logits = ...                (last time step only -> (B, vocab_size))
+    #     Step 4: probs = ...                 (F.softmax over last dim)
+    #     Step 5: topk_probs, topk_indices = ... (torch.topk)
+    #     Step 6: ix = ...                    (torch.multinomial from topk_probs)
+    #     Step 7: xcol = ...                  (torch.gather to map back to vocab ID)
+    #     Step 8: idx = ...                   (torch.cat along dim=1)
+    # return idx
+    pass
+
+# Run tests: pytest nano-gpt2/05_evaluation/b_topk_generation/test_exercise.py -v

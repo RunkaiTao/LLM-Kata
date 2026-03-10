@@ -44,28 +44,25 @@ def estimate_val_loss(model, val_loader, val_loss_steps: int, device: str = "cpu
         The average validation loss as a float.
 
     Steps:
-    1. model.eval()              — switch to evaluation mode (disables dropout)
-    2. val_loader.reset()        — start from the beginning of validation data
-    3. val_loss_accum = 0.0
-    4. with torch.no_grad():     — disable gradient computation for efficiency
-    5.   For _ in range(val_loss_steps):
-           a. x, y = val_loader.next_batch()
-           b. x, y = x.to(device), y.to(device)
-           c. logits, loss = model(x, y)
-           d. val_loss_accum += loss.item() / val_loss_steps
-              — divide by val_loss_steps to get the running mean
-    6. model.train()             — restore training mode
-    7. Return val_loss_accum
+    1. Switch model to eval mode (use model.eval)
+    2. Reset val_loader to start from the beginning
+    3. Disable gradient computation for efficiency (use torch.no_grad context)
+    4. Loop over val_loss_steps batches, computing forward loss on each
+       and accumulating the average loss
+    5. Restore model to training mode (use model.train)
+    6. Return the average validation loss
     """
     # TODO: Implement estimate_val_loss following the steps above
-    model.eval()
-    val_loader.reset()
-    val_loss_accum = 0.0
-    with torch.no_grad():
-        for _ in range(val_loss_steps):
-            x, y = val_loader.next_batch()
-            x, y = x.to(device), y.to(device)
-            logits, loss = model(x, y)
-            val_loss_accum += loss.item() / val_loss_steps
-    model.train()
-    return val_loss_accum
+    # Step 1: model.eval()
+    # Step 2: val_loader.reset()
+    # Step 3: val_loss_accum = 0.0
+    #         with torch.no_grad():
+    #             for _ in range(val_loss_steps):
+    #                 x, y = ...          (next batch, move to device)
+    #                 logits, loss = ...  (forward pass)
+    #                 val_loss_accum += loss.item() / val_loss_steps
+    # Step 4: model.train()
+    # return val_loss_accum
+    pass
+
+# Run tests: pytest nano-gpt2/05_evaluation/a_validation_loss/test_exercise.py -v

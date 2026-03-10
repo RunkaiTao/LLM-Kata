@@ -47,42 +47,33 @@ def configure_optimizers(model, weight_decay: float, learning_rate: float, devic
         A torch.optim.AdamW optimizer with two parameter groups.
 
     Steps:
-    1. Collect all parameters that require grad:
-       param_dict = {pn: p for pn, p in model.named_parameters()}
-       param_dict = {pn: p for pn, p in param_dict.items() if p.requires_grad}
+    1. Collect all parameters that require grad into a dict
+       (use model.named_parameters, filter by requires_grad)
 
-    2. Separate into decay and no-decay groups:
-       decay_params = [p for n, p in param_dict.items() if p.dim() >= 2]
-         — weight matrices in Linear layers and Embedding layers
-       nodecay_params = [p for n, p in param_dict.items() if p.dim() < 2]
-         — biases (1D) and LayerNorm parameters (1D)
+    2. Separate into two groups based on dimensionality:
+       - decay_params: 2D+ parameters (weight matrices) — apply weight decay
+       - nodecay_params: <2D parameters (biases, LayerNorm) — no weight decay
+       (use p.dim() to distinguish)
 
-    3. Create optimizer parameter groups:
-       optim_groups = [
-           {'params': decay_params, 'weight_decay': weight_decay},
-           {'params': nodecay_params, 'weight_decay': 0.0},
-       ]
+    3. Create two optimizer parameter groups with appropriate weight_decay settings
 
-    4. Check if fused AdamW is available:
-       fused_available = 'fused' in inspect.signature(torch.optim.AdamW).parameters
-       use_fused = fused_available and device_type == 'cuda'
+    4. Check if fused AdamW is available by inspecting the AdamW signature
+       for a 'fused' parameter; use it only on CUDA (use inspect.signature)
 
-    5. Create and return the optimizer:
-       torch.optim.AdamW(optim_groups, lr=learning_rate,
-                         betas=(0.9, 0.95), eps=1e-8, fused=use_fused)
+    5. Create and return an AdamW optimizer with betas=(0.9, 0.95), eps=1e-8
     """
     # TODO: Implement configure_optimizers following the steps above
-    param_dict = {pn: p for pn, p in model.named_parameters()}
-    param_dict = {pn: p for pn, p in param_dict.items() if p.requires_grad}
-    decay_params = [p for n, p in param_dict.items() if p.dim() >= 2]
-    nodecay_params = [p for n, p in param_dict.items() if p.dim() < 2]
-    optim_groups = [
-        {"params": decay_params, "weight_decay": weight_decay},
-        {"params": nodecay_params, "weight_decay": 0.0},
-    ]
-    fused_available = "fused" in inspect.signature(torch.optim.AdamW).parameters
-    use_fused = fused_available and device_type == "cuda"
-    optimizer = torch.optim.AdamW(
-        optim_groups, lr=learning_rate, betas=(0.9, 0.95), eps=1e-8, fused=use_fused
-    )
-    return optimizer
+    # Step 1: param_dict = ...      (dict of named params that require grad)
+    # Step 2: decay_params = ...    (list of params with dim >= 2)
+    #         nodecay_params = ...  (list of params with dim < 2)
+    # Step 3: optim_groups = [
+    #             {"params": decay_params, "weight_decay": weight_decay},
+    #             {"params": nodecay_params, "weight_decay": 0.0},
+    #         ]
+    # Step 4: fused_available = ... (check inspect.signature for 'fused' param)
+    #         use_fused = ...       (fused_available and device_type == "cuda")
+    # Step 5: optimizer = ...       (AdamW with betas=(0.9, 0.95), eps=1e-8)
+    # return optimizer
+    pass
+
+# Run tests: pytest nano-gpt2/04_optimizations/c_configure_optimizers/test_exercise.py -v

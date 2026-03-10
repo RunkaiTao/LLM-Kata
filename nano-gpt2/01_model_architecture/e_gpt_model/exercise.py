@@ -39,30 +39,38 @@ class GPT(nn.Module):
             config: GPTConfig instance.
 
         Steps:
-        1. Store self.config = config
-        2. Create self.transformer = nn.ModuleDict containing:
-           - wte = nn.Embedding(config.vocab_size, config.n_embd)  — token embeddings
-           - wpe = nn.Embedding(config.block_size, config.n_embd)  — position embeddings
-           - h = nn.ModuleList([Block(config) for _ in range(config.n_layer)])
-           - ln_f = nn.LayerNorm(config.n_embd)  — final layer norm
-        3. Create self.lm_head = nn.Linear(config.n_embd, config.vocab_size, bias=False)
-        4. Weight tying: self.transformer.wte.weight = self.lm_head.weight
-           — this makes the token embedding and output projection share the same parameters
-        5. Apply weight initialization: self.apply(self._init_weights)
+        1. Store config as an instance attribute
+        2. Create self.transformer as an nn.ModuleDict with named sub-modules:
+           - wte: token embedding (vocab_size -> n_embd) (use nn.Embedding)
+           - wpe: position embedding (block_size -> n_embd) (use nn.Embedding)
+           - h: list of n_layer transformer blocks (use nn.ModuleList with Block)
+           - ln_f: final layer norm over n_embd (use nn.LayerNorm)
+        3. Create self.lm_head — linear output projection from n_embd to vocab_size,
+           no bias (use nn.Linear)
+        4. Tie wte and lm_head weights so they share the same parameter
+        5. Apply weight initialization to all sub-modules (use self.apply with _init_weights)
         """
         super().__init__()
         # TODO: Implement __init__ following the steps above
+        # Step 1: self.config = ...
+        # Step 2: self.transformer = nn.ModuleDict(dict(
+        #             wte = ...   (nn.Embedding: vocab_size -> n_embd)
+        #             wpe = ...   (nn.Embedding: block_size -> n_embd)
+        #             h = ...     (nn.ModuleList of n_layer Block instances)
+        #             ln_f = ...  (nn.LayerNorm over n_embd)
+        #         ))
+        # Step 3: self.lm_head = ...  (nn.Linear: n_embd -> vocab_size, no bias)
+        # Step 4: self.transformer.wte.weight = self.lm_head.weight  (weight tying)
+        # Step 5: self.apply(self._init_weights)
         self.config = config
         self.transformer = nn.ModuleDict(dict(
-            wte=nn.Embedding(config.vocab_size, config.n_embd),
-            wpe=nn.Embedding(config.block_size, config.n_embd),
-            h=nn.ModuleList([Block(config) for _ in range(config.n_layer)]),
-            ln_f=nn.LayerNorm(config.n_embd),
+            wte = nn.Embedding(config.vocab_size, config.n_embd),
+            wpe = nn.Embedding(config.block_size, config.n_embd),
+            h = nn.ModuleList([Block(config) for _ in range(config.n_layer)]),
+            ln_f = nn.LayerNorm(config.n_embd)
         ))
-        self.lm_head = nn.Linear(config.n_embd, config.vocab_size, bias=False)
-        # weight tying
+        self.lm_head = nn.Linear(config.n_embd, config.vocab_size)
         self.transformer.wte.weight = self.lm_head.weight
-        # init weights
         self.apply(self._init_weights)
 
     def _init_weights(self, module):
@@ -70,27 +78,32 @@ class GPT(nn.Module):
         Initialize weights for the model.
 
         Rules:
-        - If module is nn.Linear:
-            std = 0.02
-            If module has attribute NANOGPT_SCALE_INIT:
-                std *= (2 * self.config.n_layer) ** -0.5
-            Set weights to Normal(mean=0.0, std=std)
-            If bias exists, set to zeros.
-        - If module is nn.Embedding:
-            Set weights to Normal(mean=0.0, std=0.02)
+        - For nn.Linear modules:
+            Initialize weights from a normal distribution with std=0.02
+            If the module has the NANOGPT_SCALE_INIT flag, scale std down
+            by (2 * n_layer)^(-0.5) to account for residual stream accumulation
+            Zero-initialize bias if present
+        - For nn.Embedding modules:
+            Initialize weights from a normal distribution with std=0.02
 
-        Hint: Use torch.nn.init.normal_() and torch.nn.init.zeros_()
+        (use torch.nn.init.normal_ and torch.nn.init.zeros_, check hasattr for the flag)
         """
         # TODO: Implement _init_weights following the rules above
+        # if isinstance(module, nn.Linear):
+        #     std = ...  (base std=0.02, scale by (2 * n_layer)**-0.5 if NANOGPT_SCALE_INIT)
+        #     torch.nn.init.normal_(module.weight, ...)
+        #     if module.bias is not None: torch.nn.init.zeros_(module.bias)
+        # elif isinstance(module, nn.Embedding):
+        #     torch.nn.init.normal_(module.weight, ...)
         if isinstance(module, nn.Linear):
             std = 0.02
-            if hasattr(module, "NANOGPT_SCALE_INIT"):
-                std *= (2 * self.config.n_layer) ** -0.5
-            torch.nn.init.normal_(module.weight, mean=0.0, std=std)
+            if hasattr(module, 'NANOGPT_SCALE_INIT'):
+                std = 0.02 * (2 * self.config.n_layer)**(-0.5)
+            torch.nn.init.normal_(module.weight, std = std)
             if module.bias is not None:
                 torch.nn.init.zeros_(module.bias)
         elif isinstance(module, nn.Embedding):
-            torch.nn.init.normal_(module.weight, mean=0.0, std=0.02)
+            torch.nn.init.normal_(module.weight, std = 0.02)
 
     def forward(self, idx, targets=None):
         """
@@ -103,33 +116,46 @@ class GPT(nn.Module):
             loss: Scalar cross-entropy loss, or None if no targets.
 
         Steps:
-        1. B, T = idx.size()
-        2. Assert T <= self.config.block_size
-        3. pos = torch.arange(0, T, dtype=torch.long, device=idx.device) -> (T,)
-        4. pos_emb = self.transformer.wpe(pos)  -> (T, n_embd)
-        5. tok_emb = self.transformer.wte(idx)  -> (B, T, n_embd)
-        6. x = tok_emb + pos_emb  (pos_emb broadcasts across batch dimension)
-        7. For each block in self.transformer.h: x = block(x)
-        8. x = self.transformer.ln_f(x)
-        9. logits = self.lm_head(x)  -> (B, T, vocab_size)
-        10. If targets is not None:
-              loss = F.cross_entropy(logits.view(-1, logits.size(-1)), targets.view(-1))
-            Else:
-              loss = None
-        11. Return (logits, loss)
+        1. Unpack B, T from idx and assert T does not exceed block_size
+        2. Create position indices 0..T-1 on the same device as idx (use torch.arange)
+        3. Look up token embeddings (wte) and position embeddings (wpe)
+        4. Add token and position embeddings (position broadcasts across batch)
+        5. Pass through each transformer block in self.transformer.h
+        6. Apply final layer norm (ln_f)
+        7. Project to vocabulary logits via lm_head -> (B, T, vocab_size)
+        8. If targets provided, compute cross-entropy loss after flattening
+           logits and targets (use F.cross_entropy); otherwise loss is None
+        9. Return (logits, loss)
         """
         # TODO: Implement forward following the steps above
-        B, T = idx.size()
-        assert T <= self.config.block_size, f"Cannot forward sequence of length {T}, block size is only {self.config.block_size}"
-        pos = torch.arange(0, T, dtype=torch.long, device=idx.device)
+        # Step 1: B, T = ...  (unpack from idx, assert T <= block_size)
+        # Step 2: pos = ...     (torch.arange 0..T-1, same device as idx)
+        # Step 3: pos_emb = ... (position embeddings via wpe)
+        #         tok_emb = ... (token embeddings via wte)
+        # Step 4: x = ...      (tok_emb + pos_emb)
+        # Step 5: for block in self.transformer.h: x = block(x)
+        # Step 6: x = ...      (apply ln_f)
+        # Step 7: logits = ... (project through lm_head)
+        # Step 8: loss = None  (if targets: compute F.cross_entropy on flattened logits/targets)
+        # return logits, loss
+        B, T = idx.shape
+        pos = torch.arange(T, device = idx.device)
         pos_emb = self.transformer.wpe(pos)
         tok_emb = self.transformer.wte(idx)
-        x = tok_emb + pos_emb
+        x = pos_emb + tok_emb
         for block in self.transformer.h:
             x = block(x)
         x = self.transformer.ln_f(x)
         logits = self.lm_head(x)
         loss = None
         if targets is not None:
-            loss = F.cross_entropy(logits.view(-1, logits.size(-1)), targets.view(-1))
+            loss = F.cross_entropy(logits.view(-1, self.config.vocab_size),targets.view(-1)) 
+        
         return logits, loss
+
+# Run tests: pytest nano-gpt2/01_model_architecture/e_gpt_model/test_exercise.py -v
+# Test individual parts:
+# pytest nano-gpt2/01_model_architecture/e_gpt_model/test_exercise.py -v -k TestModuleDict
+# pytest nano-gpt2/01_model_architecture/e_gpt_model/test_exercise.py -v -k TestWeightTying
+# pytest nano-gpt2/01_model_architecture/e_gpt_model/test_exercise.py -v -k TestScaledInit
+# pytest nano-gpt2/01_model_architecture/e_gpt_model/test_exercise.py -v -k TestForwardPass

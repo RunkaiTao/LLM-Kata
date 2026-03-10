@@ -42,31 +42,33 @@ class CausalSelfAttention(nn.Module):
             config: GPTConfig instance with n_embd, n_head, block_size.
 
         Steps:
-        1. Assert config.n_embd % config.n_head == 0
-        2. Create self.c_attn as nn.Linear(config.n_embd, 3 * config.n_embd)
-           — this single layer computes Q, K, V for ALL heads in one shot
-        3. Create self.c_proj as nn.Linear(config.n_embd, config.n_embd)
-           — output projection after concatenating heads
-        4. Set self.c_proj.NANOGPT_SCALE_INIT = 1
-           — flag used later by GPT._init_weights for scaled initialization
-        5. Store self.n_head = config.n_head and self.n_embd = config.n_embd
-        6. Register a buffer named 'bias' containing a lower-triangular causal mask
-           of shape (1, 1, config.block_size, config.block_size)
-           — use torch.tril(torch.ones(...))
+        1. Assert that n_embd is divisible by n_head
+        2. Create self.c_attn — a single linear projection from n_embd to 3*n_embd
+           that computes Q, K, V for all heads in one shot (use nn.Linear)
+        3. Create self.c_proj — output projection from n_embd to n_embd (use nn.Linear)
+        4. Flag c_proj for scaled initialization by setting NANOGPT_SCALE_INIT attribute to 1
+        5. Store n_head and n_embd from config as instance attributes
+        6. Register a buffer named 'bias' — a lower-triangular causal mask
+           of shape (1, 1, block_size, block_size)
+           (use register_buffer, torch.tril, torch.ones)
         """
         super().__init__()
         # TODO: Implement __init__ following the steps above
+        # Step 1: assert ...
+        # Step 2: self.c_attn = ...  (nn.Linear: n_embd -> 3 * n_embd)
+        # Step 3: self.c_proj = ...  (nn.Linear: n_embd -> n_embd)
+        # Step 4: self.c_proj.NANOGPT_SCALE_INIT = ...
+        # Step 5: self.n_head = ..., self.n_embd = ...
+        # Step 6: self.register_buffer("bias", ...)  (lower-triangular mask, shape (1, 1, block_size, block_size))
         assert config.n_embd % config.n_head == 0
         self.c_attn = nn.Linear(config.n_embd, 3 * config.n_embd)
         self.c_proj = nn.Linear(config.n_embd, config.n_embd)
         self.c_proj.NANOGPT_SCALE_INIT = 1
         self.n_head = config.n_head
         self.n_embd = config.n_embd
-        self.register_buffer(
-            "bias",
-            torch.tril(torch.ones(config.block_size, config.block_size))
-            .view(1, 1, config.block_size, config.block_size),
-        )
+        self.register_buffer("bias", torch.tril(torch.ones(config.block_size, config.block_size)).view(1, 1, config.block_size, config.block_size))
+
+
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
@@ -77,32 +79,47 @@ class CausalSelfAttention(nn.Module):
             Output tensor of shape (B, T, C).
 
         Steps:
-        1. Extract B, T, C from x.size()
-        2. Compute qkv = self.c_attn(x) -> (B, T, 3*C)
-        3. Split qkv into q, k, v using qkv.split(self.n_embd, dim=2) -> each (B, T, C)
-        4. Reshape k: k.view(B, T, self.n_head, C // self.n_head).transpose(1, 2) -> (B, nh, T, hs)
-        5. Reshape q the same way -> (B, nh, T, hs)
-        6. Reshape v the same way -> (B, nh, T, hs)
-        7. Compute attention scores: att = (q @ k.transpose(-2, -1)) * (1.0 / math.sqrt(k.size(-1)))
-           -> (B, nh, T, T)
-        8. Apply causal mask: att = att.masked_fill(self.bias[:, :, :T, :T] == 0, float('-inf'))
-        9. Normalize: att = F.softmax(att, dim=-1)
-        10. Apply attention to values: y = att @ v -> (B, nh, T, hs)
-        11. Reassemble heads: y = y.transpose(1, 2).contiguous().view(B, T, C) -> (B, T, C)
-        12. Output projection: y = self.c_proj(y)
-        13. Return y
+        1. Unpack batch size B, sequence length T, and embedding dim C from x
+        2. Project x through c_attn to get combined qkv -> (B, T, 3*C)
+        3. Split qkv into q, k, v along dim 2, each of size n_embd (use .split)
+        4. Reshape q, k, v for multi-head: split C into n_head groups of head_size,
+           then transpose to (B, n_head, T, head_size) (use .view and .transpose)
+        5. Compute scaled dot-product attention scores between q and k,
+           scaling by 1/sqrt(head_size) -> (B, n_head, T, T) (use math.sqrt)
+        6. Apply causal mask from self.bias (sliced to T), filling masked positions
+           with -inf (use .masked_fill)
+        7. Normalize attention weights to probabilities (use F.softmax over last dim)
+        8. Apply attention weights to v -> (B, n_head, T, head_size)
+        9. Reassemble all heads: transpose and reshape back to (B, T, C)
+           (use .transpose, .contiguous, .view)
+        10. Project through c_proj and return
         """
         # TODO: Implement forward following the steps above
+        # Step 1:  B, T, C = ...
+        # Step 2:  qkv = ...                (project x through c_attn)
+        # Step 3:  q, k, v = ...            (split qkv along dim=2, each size n_embd)
+        # Step 4:  k = ..., q = ..., v = ... (reshape each to (B, n_head, T, head_size) via .view and .transpose)
+        # Step 5:  att = ...                (scaled dot-product: (q @ k^T) / sqrt(head_size))
+        # Step 6:  att = ...                (apply causal mask with .masked_fill, fill with -inf)
+        # Step 7:  att = ...                (softmax over last dim)
+        # Step 8:  y = ...                  (att @ v)
+        # Step 9:  y = ...                  (reassemble heads: .transpose, .contiguous, .view back to (B, T, C))
+        # Step 10: y = ...                  (project through c_proj)
+        # return y
         B, T, C = x.size()
         qkv = self.c_attn(x)
         q, k, v = qkv.split(self.n_embd, dim=2)
-        k = k.view(B, T, self.n_head, C // self.n_head).transpose(1, 2)
-        q = q.view(B, T, self.n_head, C // self.n_head).transpose(1, 2)
-        v = v.view(B, T, self.n_head, C // self.n_head).transpose(1, 2)
-        att = (q @ k.transpose(-2, -1)) * (1.0 / math.sqrt(k.size(-1)))
-        att = att.masked_fill(self.bias[:, :, :T, :T] == 0, float("-inf"))
-        att = F.softmax(att, dim=-1)
+        k = k.view(B, T, self.n_head, self.n_embd//self.n_head).transpose(1,2)
+        q = q.view(B, T, self.n_head, self.n_embd//self.n_head).transpose(1,2)
+        v = v.view(B, T, self.n_head, self.n_embd//self.n_head).transpose(1,2)
+        att = q @ k.transpose(-1,-2)/math.sqrt(k.size(-1))
+        att = att.masked_fill(self.bias[:, :, :T, :T] == 0, float('-inf'))
+        att = F.softmax(att, dim = - 1)
         y = att @ v
-        y = y.transpose(1, 2).contiguous().view(B, T, C)
+        y = y.transpose(1,2).contiguous().view(B,T,C)
         y = self.c_proj(y)
+
         return y
+
+
+# Run tests: pytest nano-gpt2/01_model_architecture/b_causal_self_attention/test_exercise.py -v

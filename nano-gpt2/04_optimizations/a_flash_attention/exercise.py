@@ -42,22 +42,22 @@ class CausalSelfAttention(nn.Module):
         Args:
             config: GPTConfig instance with n_embd, n_head, block_size.
 
-        Steps (same as 01/b EXCEPT step 6):
-        1. Assert config.n_embd % config.n_head == 0
-        2. Create self.c_attn = nn.Linear(config.n_embd, 3 * config.n_embd)
-        3. Create self.c_proj = nn.Linear(config.n_embd, config.n_embd)
-        4. Set self.c_proj.NANOGPT_SCALE_INIT = 1
-        5. Store self.n_head and self.n_embd
+        Steps (same as 01/b EXCEPT no causal mask buffer):
+        1. Assert that n_embd is divisible by n_head
+        2. Create self.c_attn — single linear projection from n_embd to 3*n_embd (use nn.Linear)
+        3. Create self.c_proj — output projection from n_embd to n_embd (use nn.Linear)
+        4. Flag c_proj for scaled initialization (set NANOGPT_SCALE_INIT attribute to 1)
+        5. Store n_head and n_embd from config
         6. NO register_buffer needed! Flash attention handles causal masking internally.
         """
         super().__init__()
         # TODO: Implement __init__ (note: NO causal mask buffer needed)
-        assert config.n_embd % config.n_head == 0
-        self.c_attn = nn.Linear(config.n_embd, 3 * config.n_embd)
-        self.c_proj = nn.Linear(config.n_embd, config.n_embd)
-        self.c_proj.NANOGPT_SCALE_INIT = 1
-        self.n_head = config.n_head
-        self.n_embd = config.n_embd
+        # Step 1: assert ...
+        # Step 2: self.c_attn = ...  (nn.Linear: n_embd -> 3 * n_embd)
+        # Step 3: self.c_proj = ...  (nn.Linear: n_embd -> n_embd)
+        # Step 4: self.c_proj.NANOGPT_SCALE_INIT = ...
+        # Step 5: self.n_head = ..., self.n_embd = ...
+        pass
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
@@ -68,25 +68,25 @@ class CausalSelfAttention(nn.Module):
             Output tensor of shape (B, T, C).
 
         Steps:
-        1. B, T, C = x.size()
-        2. qkv = self.c_attn(x) -> (B, T, 3*C)
-        3. Split: q, k, v = qkv.split(self.n_embd, dim=2) -> each (B, T, C)
-        4. Reshape k: k.view(B, T, self.n_head, C // self.n_head).transpose(1, 2) -> (B, nh, T, hs)
-        5. Same for q and v
-        6. FLASH ATTENTION: y = F.scaled_dot_product_attention(q, k, v, is_causal=True)
+        1. Unpack B, T, C from x
+        2. Project x through c_attn to get combined qkv -> (B, T, 3*C)
+        3. Split into q, k, v along dim 2, each of size n_embd (use .split)
+        4. Reshape q, k, v for multi-head: (B, n_head, T, head_size) (use .view and .transpose)
+        5. Compute attention using flash attention with causal masking
+           (use F.scaled_dot_product_attention with is_causal=True)
            — this single call replaces: scale, mask, softmax, matmul
-        7. Reassemble: y = y.transpose(1, 2).contiguous().view(B, T, C)
-        8. Output projection: y = self.c_proj(y)
-        9. Return y
+        6. Reassemble heads back to (B, T, C) (use .transpose, .contiguous, .view)
+        7. Project through c_proj and return
         """
         # TODO: Implement forward using F.scaled_dot_product_attention
-        B, T, C = x.size()
-        qkv = self.c_attn(x)
-        q, k, v = qkv.split(self.n_embd, dim=2)
-        k = k.view(B, T, self.n_head, C // self.n_head).transpose(1, 2)
-        q = q.view(B, T, self.n_head, C // self.n_head).transpose(1, 2)
-        v = v.view(B, T, self.n_head, C // self.n_head).transpose(1, 2)
-        y = F.scaled_dot_product_attention(q, k, v, is_causal=True)
-        y = y.transpose(1, 2).contiguous().view(B, T, C)
-        y = self.c_proj(y)
-        return y
+        # Step 1: B, T, C = ...
+        # Step 2: qkv = ...                (project x through c_attn)
+        # Step 3: q, k, v = ...            (split qkv along dim=2, each size n_embd)
+        # Step 4: k = ..., q = ..., v = ... (reshape each to (B, n_head, T, head_size))
+        # Step 5: y = ...                  (F.scaled_dot_product_attention with is_causal=True)
+        # Step 6: y = ...                  (reassemble heads: .transpose, .contiguous, .view -> (B, T, C))
+        # Step 7: y = ...                  (project through c_proj)
+        # return y
+        pass
+
+# Run tests: pytest nano-gpt2/04_optimizations/a_flash_attention/test_exercise.py -v

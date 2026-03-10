@@ -17,17 +17,24 @@ from dataclasses import dataclass
 # ---------------------------------------------------------------------------
 
 # TODO: Decorate the class with @dataclass
-# TODO: Define the following fields with type int and default values:
-#   - block_size: int = 1024   # maximum sequence length
-#   - vocab_size: int = 50257  # number of tokens: 50,000 BPE merges + 256 byte tokens + 1 <|endoftext|>
-#   - n_layer: int = 12        # number of transformer layers
-#   - n_head: int = 12         # number of attention heads
-#   - n_embd: int = 768        # embedding dimension
+# TODO: Define five integer fields with GPT-2 (124M) defaults:
+#   - block_size: maximum sequence length (1024)
+#   - vocab_size: total token count (50257) — 50k BPE merges + 256 bytes + 1 special token
+#   - n_layer: number of transformer layers (12)
+#   - n_head: number of attention heads (12)
+#   - n_embd: embedding dimension (768)
+# (use the standard dataclass field syntax: name: type = default)
 
 @dataclass
 class GPTConfig:
+    # Step 1: block_size = ...  (maximum sequence length, default 1024)
+    # Step 2: vocab_size = ...  (total token count, default 50257)
+    # Step 3: n_layer = ...     (number of transformer layers, default 12)
+    # Step 4: n_head = ...      (number of attention heads, default 12)
+    # Step 5: n_embd = ...      (embedding dimension, default 768)
     block_size: int = 1024
     vocab_size: int = 50257
     n_layer: int = 12
     n_head: int = 12
     n_embd: int = 768
+# Run tests: pytest nano-gpt2/01_model_architecture/a_gpt_config/test_exercise.py -v

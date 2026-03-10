@@ -36,19 +36,22 @@ class MLP(nn.Module):
             config: GPTConfig instance with n_embd.
 
         Steps:
-        1. Create self.c_fc = nn.Linear(config.n_embd, 4 * config.n_embd)
-           — expansion layer (4x wider)
-        2. Create self.gelu = nn.GELU(approximate='tanh')
-           — GPT-2 uses the tanh approximation of GELU, not exact GELU or ReLU
-        3. Create self.c_proj = nn.Linear(4 * config.n_embd, config.n_embd)
-           — projection back to embedding dimension
-        4. Set self.c_proj.NANOGPT_SCALE_INIT = 1
+        1. Create self.c_fc — expansion linear layer from n_embd to 4*n_embd (use nn.Linear)
+        2. Create self.gelu — GELU activation with tanh approximation
+           (use nn.GELU with approximate param; GPT-2 uses tanh, not exact GELU)
+        3. Create self.c_proj — projection linear layer from 4*n_embd back to n_embd (use nn.Linear)
+        4. Flag c_proj for scaled initialization (set NANOGPT_SCALE_INIT attribute to 1)
         """
         super().__init__()
         # TODO: Implement __init__ following the steps above
-        self.c_fc = nn.Linear(config.n_embd, 4 * config.n_embd)
+        # Step 1: self.c_fc = ...    (nn.Linear: n_embd -> 4 * n_embd)
+        # Step 2: self.gelu = ...    (nn.GELU with approximate="tanh")
+        # Step 3: self.c_proj = ...  (nn.Linear: 4 * n_embd -> n_embd)
+        # Step 4: self.c_proj.NANOGPT_SCALE_INIT = ...
+        n_embd = config.n_embd
+        self.c_fc = nn.Linear(n_embd, 4 * n_embd)
         self.gelu = nn.GELU(approximate="tanh")
-        self.c_proj = nn.Linear(4 * config.n_embd, config.n_embd)
+        self.c_proj = nn.Linear(4 * n_embd, n_embd)
         self.c_proj.NANOGPT_SCALE_INIT = 1
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -60,13 +63,20 @@ class MLP(nn.Module):
             Output tensor of shape (B, T, C).
 
         Steps:
-        1. x = self.c_fc(x)    -> (B, T, 4*C)
-        2. x = self.gelu(x)    -> (B, T, 4*C)
-        3. x = self.c_proj(x)  -> (B, T, C)
-        4. Return x
+        1. Pass x through the expansion layer c_fc -> (B, T, 4*C)
+        2. Apply GELU activation -> (B, T, 4*C)
+        3. Pass through projection layer c_proj -> (B, T, C)
+        4. Return the result
         """
         # TODO: Implement forward following the steps above
+        # Step 1: x = ...  (pass through c_fc)
+        # Step 2: x = ...  (apply gelu activation)
+        # Step 3: x = ...  (pass through c_proj)
+        # return x
         x = self.c_fc(x)
         x = self.gelu(x)
         x = self.c_proj(x)
+
         return x
+
+# Run tests: pytest nano-gpt2/01_model_architecture/c_mlp/test_exercise.py -v

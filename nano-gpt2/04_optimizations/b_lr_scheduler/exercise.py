@@ -32,25 +32,24 @@ def get_lr(it: int, warmup_steps: int, max_steps: int, max_lr: float, min_lr: fl
         The learning rate for iteration `it`.
 
     Steps:
-    1. If it < warmup_steps:
-         return max_lr * (it + 1) / warmup_steps
-         — linear warmup from ~0 to max_lr
-         — note: (it + 1) so that step 0 gets a small non-zero lr
-    2. If it > max_steps:
-         return min_lr
-         — constant after training is done
-    3. Otherwise (cosine decay region):
-         decay_ratio = (it - warmup_steps) / (max_steps - warmup_steps)
-         coeff = 0.5 * (1.0 + math.cos(math.pi * decay_ratio))
-         — coeff goes from 1.0 (at warmup_steps) to 0.0 (at max_steps)
-         return min_lr + coeff * (max_lr - min_lr)
+    1. Warmup region (it < warmup_steps):
+         Linearly scale from ~0 to max_lr
+         Use (it + 1) so step 0 gets a small non-zero lr
+    2. Post-training region (it > max_steps):
+         Return min_lr (constant)
+    3. Cosine decay region (between warmup_steps and max_steps):
+         Compute a decay_ratio from 0.0 to 1.0 over this range
+         Apply cosine schedule to interpolate between max_lr and min_lr
+         (use math.cos with math.pi)
     """
     # TODO: Implement get_lr following the steps above
-    if it < warmup_steps:
-        return max_lr * (it + 1) / warmup_steps
-    if it > max_steps:
-        return min_lr
-    decay_ratio = (it - warmup_steps) / (max_steps - warmup_steps)
-    assert 0 <= decay_ratio <= 1
-    coeff = 0.5 * (1.0 + math.cos(math.pi * decay_ratio))
-    return min_lr + coeff * (max_lr - min_lr)
+    # Step 1: if it < warmup_steps:
+    #             return ...  (linear warmup: max_lr * (it + 1) / warmup_steps)
+    # Step 2: if it > max_steps:
+    #             return min_lr
+    # Step 3: decay_ratio = ...  (0.0 to 1.0 over the cosine decay range)
+    #         coeff = ...        (0.5 * (1.0 + math.cos(math.pi * decay_ratio)))
+    #         return min_lr + coeff * (max_lr - min_lr)
+    pass
+
+# Run tests: pytest nano-gpt2/04_optimizations/b_lr_scheduler/test_exercise.py -v

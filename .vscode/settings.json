@@ -1,0 +1,5 @@
+{
+    "javascript.suggest.enabled": true,
+    "typescript.suggest.enabled": true,
+    "terminal.integrated.suggest.enabled": true
+}

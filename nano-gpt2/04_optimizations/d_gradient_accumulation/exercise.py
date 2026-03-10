@@ -49,33 +49,30 @@ def train_step(model, optimizer, train_loader, grad_accum_steps: int, device: st
         The accumulated loss value (float) for this training step.
 
     Steps:
-    1. optimizer.zero_grad()    — clear gradients from previous step
-    2. loss_accum = 0.0
-    3. For micro_step in range(grad_accum_steps):
-       a. x, y = train_loader.next_batch()
-       b. x, y = x.to(device), y.to(device)
-       c. logits, loss = model(x, y)
-       d. loss = loss / grad_accum_steps
-          — scale loss so accumulated gradients equal the mean
-       e. loss_accum += loss.detach().item()
-          — track total loss (detach to avoid keeping graph)
-       f. loss.backward()
-          — gradients ACCUMULATE (they add up across calls)
-    4. norm = torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
-       — clip gradient norm to max 1.0 to prevent explosions
-    5. optimizer.step()
-    6. Return loss_accum
+    1. Clear gradients from previous step
+    2. For each micro-step in range(grad_accum_steps):
+       a. Get a batch from train_loader and move to device
+       b. Forward pass to get loss
+       c. Scale loss by 1/grad_accum_steps before backward so accumulated
+          gradients equal the mean (not the sum)
+       d. Track the total loss (detach before calling .item() to avoid keeping graph)
+       e. Call backward — gradients accumulate across calls
+    3. Clip the global gradient norm to 1.0 (use torch.nn.utils.clip_grad_norm_)
+    4. Step the optimizer
+    5. Return the accumulated loss value
     """
     # TODO: Implement train_step following the steps above
-    optimizer.zero_grad()
-    loss_accum = 0.0
-    for micro_step in range(grad_accum_steps):
-        x, y = train_loader.next_batch()
-        x, y = x.to(device), y.to(device)
-        logits, loss = model(x, y)
-        loss = loss / grad_accum_steps
-        loss_accum += loss.detach().item()
-        loss.backward()
-    norm = torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
-    optimizer.step()
-    return loss_accum
+    # Step 1: optimizer.zero_grad()
+    # Step 2: loss_accum = 0.0
+    #         for micro_step in range(grad_accum_steps):
+    #             a. x, y = ...          (next batch, move to device)
+    #             b. logits, loss = ...  (forward pass)
+    #             c. loss = loss / grad_accum_steps  (scale for mean gradient)
+    #             d. loss_accum += loss.detach().item()
+    #             e. loss.backward()
+    # Step 3: norm = ...  (torch.nn.utils.clip_grad_norm_, max_norm=1.0)
+    # Step 4: optimizer.step()
+    # return loss_accum
+    pass
+
+# Run tests: pytest nano-gpt2/04_optimizations/d_gradient_accumulation/test_exercise.py -v

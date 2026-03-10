@@ -34,31 +34,30 @@ class DataLoaderLite:
             T: Sequence length (context window).
 
         Steps:
-        1. Assert len(shards) > 0 — must have at least one shard
-        2. Store self.shards = shards
-        3. Store self.B = B and self.T = T
-        4. Call self.reset()
+        1. Assert there is at least one shard
+        2. Store shards, B, and T as instance attributes
+        3. Call self.reset() to initialize shard and position state
         """
         # TODO: Implement __init__ following the steps above
-        assert len(shards) > 0, "must have at least one shard"
-        self.shards = shards
-        self.B = B
-        self.T = T
-        self.reset()
+        # Step 1: assert len(shards) > 0
+        # Step 2: self.shards = ..., self.B = ..., self.T = ...
+        # Step 3: self.reset()
+        pass
 
     def reset(self):
         """
         Reset the loader to the beginning of the first shard.
 
         Steps:
-        1. self.current_shard = 0
-        2. self.tokens = self.shards[self.current_shard]
-        3. self.current_position = 0
+        1. Set current_shard index to 0
+        2. Load tokens from the first shard
+        3. Reset current_position to the start
         """
         # TODO: Implement reset following the steps above
-        self.current_shard = 0
-        self.tokens = self.shards[self.current_shard]
-        self.current_position = 0
+        # Step 1: self.current_shard = ...
+        # Step 2: self.tokens = ...           (load from self.shards)
+        # Step 3: self.current_position = ...
+        pass
 
     def next_batch(self):
         """
@@ -70,26 +69,26 @@ class DataLoaderLite:
             - y has shape (B, T) — target token IDs (shifted by 1)
 
         Steps:
-        1. B, T = self.B, self.T
-        2. Extract a buffer: buf = self.tokens[self.current_position : self.current_position + B*T + 1]
-           — we need B*T + 1 tokens to create B*T inputs and B*T targets (shifted by 1)
-        3. x = buf[:-1].view(B, T)  — inputs
-        4. y = buf[1:].view(B, T)   — targets (next token for each position)
-        5. Advance position: self.current_position += B * T
-        6. If the next batch would exceed the current shard length:
-             self.current_shard = (self.current_shard + 1) % len(self.shards)
-             self.tokens = self.shards[self.current_shard]
-             self.current_position = 0
-        7. Return (x, y)
+        1. Extract a contiguous buffer of B*T + 1 tokens starting at current_position
+           — the extra +1 token provides the target for the last input position
+        2. Split the buffer into inputs x (all but last) and targets y (all but first),
+           then reshape both to (B, T) (use .view)
+        3. Advance current_position by B*T
+        4. If the next batch would overflow the current shard, wrap around to the
+           next shard (cycling with modulo) and reset position to 0
+        5. Return (x, y)
         """
         # TODO: Implement next_batch following the steps above
-        B, T = self.B, self.T
-        buf = self.tokens[self.current_position: self.current_position + B * T + 1]
-        x = buf[:-1].view(B, T)
-        y = buf[1:].view(B, T)
-        self.current_position += B * T
-        if self.current_position + (B * T + 1) > len(self.tokens):
-            self.current_shard = (self.current_shard + 1) % len(self.shards)
-            self.tokens = self.shards[self.current_shard]
-            self.current_position = 0
-        return x, y
+        # Step 1: B, T = ...
+        #         buf = ...  (slice B*T + 1 tokens from current_position)
+        # Step 2: x = ...    (buf[:-1] reshaped to (B, T))
+        #         y = ...    (buf[1:] reshaped to (B, T))
+        # Step 3: self.current_position += B * T
+        # Step 4: if next batch would overflow:
+        #             self.current_shard = ...  (cycle with modulo)
+        #             self.tokens = ...         (load new shard)
+        #             self.current_position = 0
+        # return x, y
+        pass
+
+# Run tests: pytest nano-gpt2/02_data_and_tokenization/b_data_loader_lite/test_exercise.py -v

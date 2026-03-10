@@ -24,15 +24,14 @@ def get_encoder():
     """
     Return the GPT-2 BPE encoder from tiktoken.
 
-    Steps:
-    1. Call tiktoken.get_encoding("gpt2")
-    2. Return the encoder object
-
     Returns:
         A tiktoken Encoding object for GPT-2.
+
+    Hint: Use tiktoken.get_encoding with the "gpt2" encoding name.
     """
     # TODO: Implement get_encoder
-    return tiktoken.get_encoding("gpt2")
+    # return ...  (tiktoken.get_encoding with "gpt2")
+    pass
 
 
 def encode(text: str, encoder) -> list:
@@ -46,12 +45,11 @@ def encode(text: str, encoder) -> list:
     Returns:
         A list of integer token IDs.
 
-    Steps:
-    1. Call encoder.encode(text) to tokenize the text
-    2. Return the list of token IDs
+    Hint: The encoder object has an encode method that takes a string.
     """
     # TODO: Implement encode
-    return encoder.encode(text)
+    # return ...  (use encoder.encode)
+    pass
 
 
 def decode(tokens: list, encoder) -> str:
@@ -65,12 +63,11 @@ def decode(tokens: list, encoder) -> str:
     Returns:
         The decoded string.
 
-    Steps:
-    1. Call encoder.decode(tokens)
-    2. Return the decoded string
+    Hint: The encoder object has a decode method that takes a list of token IDs.
     """
     # TODO: Implement decode
-    return encoder.decode(tokens)
+    # return ...  (use encoder.decode)
+    pass
 
 
 def get_eot_token(encoder) -> int:
@@ -86,9 +83,11 @@ def get_eot_token(encoder) -> int:
     Returns:
         The integer ID of the <|endoftext|> token.
 
-    Steps:
-    1. Access encoder._special_tokens['<|endoftext|>']
-    2. Return it
+    Hint: The encoder stores special tokens in a _special_tokens dict,
+    keyed by the token string (e.g. '<|endoftext|>').
     """
     # TODO: Implement get_eot_token
-    return encoder._special_tokens["<|endoftext|>"]
+    # return ...  (access encoder._special_tokens dict with "<|endoftext|>" key)
+    pass
+
+# Run tests: pytest nano-gpt2/02_data_and_tokenization/a_tokenization/test_exercise.py -v

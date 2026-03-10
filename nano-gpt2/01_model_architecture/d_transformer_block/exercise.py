@@ -38,13 +38,17 @@ class Block(nn.Module):
             config: GPTConfig instance.
 
         Steps:
-        1. Create self.ln_1 = nn.LayerNorm(config.n_embd)  — norm before attention
-        2. Create self.attn = CausalSelfAttention(config)   — multi-head attention
-        3. Create self.ln_2 = nn.LayerNorm(config.n_embd)  — norm before MLP
-        4. Create self.mlp = MLP(config)                     — feed-forward network
+        1. Create self.ln_1 — layer norm over n_embd (use nn.LayerNorm)
+        2. Create self.attn — causal self-attention sub-layer (use CausalSelfAttention)
+        3. Create self.ln_2 — layer norm over n_embd (use nn.LayerNorm)
+        4. Create self.mlp — feed-forward sub-layer (use MLP)
         """
         super().__init__()
         # TODO: Implement __init__ following the steps above
+        # Step 1: self.ln_1 = ...  (nn.LayerNorm over n_embd)
+        # Step 2: self.attn = ...  (CausalSelfAttention)
+        # Step 3: self.ln_2 = ...  (nn.LayerNorm over n_embd)
+        # Step 4: self.mlp = ...   (MLP)
         self.ln_1 = nn.LayerNorm(config.n_embd)
         self.attn = CausalSelfAttention(config)
         self.ln_2 = nn.LayerNorm(config.n_embd)
@@ -59,11 +63,19 @@ class Block(nn.Module):
             Output tensor of shape (B, T, C).
 
         Steps:
-        1. x = x + self.attn(self.ln_1(x))   — pre-norm attention + residual
-        2. x = x + self.mlp(self.ln_2(x))    — pre-norm MLP + residual
+        1. Apply layer norm (ln_1) to x, pass through self-attention (attn),
+           then add residual connection back to x
+        2. Apply layer norm (ln_2) to x, pass through feed-forward (mlp),
+           then add residual connection back to x
         3. Return x
         """
         # TODO: Implement forward following the steps above
+        # Step 1: x = x + ...  (apply ln_1, then attn, then add residual)
+        # Step 2: x = x + ...  (apply ln_2, then mlp, then add residual)
+        # return x
         x = x + self.attn(self.ln_1(x))
         x = x + self.mlp(self.ln_2(x))
+
         return x
+
+# Run tests: pytest nano-gpt2/01_model_architecture/d_transformer_block/test_exercise.py -v

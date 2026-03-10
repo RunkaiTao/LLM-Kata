@@ -42,22 +42,31 @@ class GPT(_GPTBase):
             Tensor of shape (B, T + max_new_tokens) with the generated sequence.
 
         Steps:
-        1. For each of max_new_tokens iterations:
-           a. Crop idx to at most the last self.config.block_size tokens as idx_cond
-              — prevents exceeding the model's maximum context window
-           b. Get logits from self(idx_cond), ignore loss -> logits is (B, T', vocab_size)
-           c. Extract logits at the last time step only: logits[:, -1, :] -> (B, vocab_size)
-           d. Convert to probabilities: probs = F.softmax(logits, dim=-1) -> (B, vocab_size)
-           e. Sample next token: idx_next = torch.multinomial(probs, num_samples=1) -> (B, 1)
-           f. Append to sequence: idx = torch.cat((idx, idx_next), dim=1) -> (B, T+1)
-        2. Return idx
+        For each of max_new_tokens iterations:
+        1. Crop idx to the last block_size tokens to stay within context window
+        2. Run a forward pass on the cropped context, discard the loss
+        3. Take logits at the last time step only -> (B, vocab_size)
+        4. Convert to probabilities (use F.softmax)
+        5. Sample a single next token from the distribution (use torch.multinomial)
+        6. Append the sampled token to the sequence (use torch.cat along dim 1)
+        Return the full sequence
         """
         # TODO: Implement autoregressive generation following the steps above
+        # for _ in range(max_new_tokens):
+        #     Step 1: idx_cond = ...  (crop idx to last block_size tokens)
+        #     Step 2: logits, _ = ... (forward pass, discard loss)
+        #     Step 3: logits = ...    (take last time step only -> (B, vocab_size))
+        #     Step 4: probs = ...     (F.softmax over last dim)
+        #     Step 5: idx_next = ...  (torch.multinomial, num_samples=1)
+        #     Step 6: idx = ...       (torch.cat along dim=1)
+        # return idx
         for _ in range(max_new_tokens):
-            idx_cond = idx[:, -self.config.block_size:]
+            idx_cond = idx[:,-self.config.block_size:]
             logits, _ = self(idx_cond)
             logits = logits[:, -1, :]
-            probs = F.softmax(logits, dim=-1)
+            probs = F.softmax(logits, dim = -1)
             idx_next = torch.multinomial(probs, num_samples=1)
-            idx = torch.cat((idx, idx_next), dim=1)
+            idx = torch.cat(idx, idx_next, dim = -1)
         return idx
+
+# Run tests: pytest nano-gpt2/01_model_architecture/f_generate/test_exercise.py -v

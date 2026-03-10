@@ -41,27 +41,27 @@ def train(model, train_loader, max_steps, learning_rate, device="cpu"):
         A list of float loss values, one per training step.
 
     Steps:
-    1. Create an AdamW optimizer: torch.optim.AdamW(model.parameters(), lr=learning_rate)
-    2. Initialize an empty list loss_history to record loss at each step.
-    3. For step in range(max_steps):
-       a. x, y = train_loader.next_batch()
-       b. x, y = x.to(device), y.to(device)
-       c. logits, loss = model(x, y)    — forward pass with targets computes loss
-       d. optimizer.zero_grad(set_to_none=True)  — clear old gradients efficiently
-       e. loss.backward()                — backpropagate
-       f. optimizer.step()               — update parameters
-       g. loss_history.append(loss.item())  — record the scalar loss value
+    1. Create an AdamW optimizer for the model (use torch.optim.AdamW)
+    2. Initialize an empty loss_history list
+    3. For each of max_steps iterations:
+       a. Get the next batch from train_loader and move to device
+       b. Forward pass with targets to get logits and loss
+       c. Zero gradients, backpropagate, and step the optimizer
+          (use optimizer.zero_grad with set_to_none=True for efficiency)
+       d. Record the scalar loss value in loss_history
     4. Return loss_history
     """
     # TODO: Implement train following the steps above
-    optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate)
-    loss_history = []
-    for step in range(max_steps):
-        x, y = train_loader.next_batch()
-        x, y = x.to(device), y.to(device)
-        logits, loss = model(x, y)
-        optimizer.zero_grad(set_to_none=True)
-        loss.backward()
-        optimizer.step()
-        loss_history.append(loss.item())
-    return loss_history
+    # Step 1: optimizer = ...    (torch.optim.AdamW)
+    # Step 2: loss_history = []
+    # Step 3: for step in range(max_steps):
+    #     a. x, y = ...          (next batch, move to device)
+    #     b. logits, loss = ...  (forward pass with targets)
+    #     c. optimizer.zero_grad(set_to_none=True)
+    #        loss.backward()
+    #        optimizer.step()
+    #     d. loss_history.append(loss.item())
+    # return loss_history
+    pass
+
+# Run tests: pytest nano-gpt2/03_training/a_training_loop/test_exercise.py -v
