@@ -1,0 +1,4 @@
+[tool.pytest.ini_options]
+# Use importlib import mode to avoid module name collisions
+# (all exercises have the same filenames: exercise.py, test_exercise.py)
+importmode = "importlib"
